@@ -1,3 +1,11 @@
+/*
+Quinn Stratton
+Prof. Lewis
+Lewis University Machine Learning
+
+Demonstrates use of k-NN algorithm for k = 1.
+*/
+
 Table dataset; // Table object from Table class
 
 int rowCount;
@@ -26,6 +34,7 @@ float[] heightTest;
 // Prediction variables
 int[] predictedTestType; 
 
+// Sorts data from input arrays into arrays specifically for testing and training data
 void sortData() { // pass in input arrays?
   int j = 0; // Counters
   int k = 0;
@@ -54,10 +63,10 @@ void sortData() { // pass in input arrays?
     }
   }
 }
+
+// Finds minumum Euclidean distance between each testing point and each training point.
+// Assigns a predicted label to each test point based on which training point is closest.
 void predictTestType() {
-  // iterate over all training values
-  // for each training value (x,y) (width,height) find Euclidean distance between the current test (x,y)
-  // and the training value 
   predictedLabelTest = new int[testDataCount];
   double minDistance;
   double distance;
@@ -65,13 +74,15 @@ void predictTestType() {
     minDistance = Double.MAX_VALUE;
     for (int j = 0; j < trainDataCount; j++) {
       distance = Math.sqrt(Math.pow((widthTest[i] - widthTraining[j]), 2) + Math.pow((heightTest[i] - heightTraining[j]), 2));
-      if (Double.compare(distance, minDistance) < 0) { // swap
+      if (Double.compare(distance, minDistance) < 0) { // closer, so make this nearest neghbor
         minDistance = distance; 
         predictedLabelTest[i] = labelTrain[j];
       }
     }
   }
 }
+
+// Returns the accuracy rate for the nearest neighbor algorithm.
 double testAccuracy() {
   // Gather all the test data whose type is the correct type and divide that by total number of data points
   int numCorrect = 0;
@@ -82,6 +93,8 @@ double testAccuracy() {
   return (double)numCorrect / (double)testDataCount;
   // return the result
 }
+
+// Reads data from csv file and puts it into different arrays for different values.
 void readInput() {
   rowCount = dataset.getRowCount() - 1;
   labelInput = new int[rowCount];
@@ -110,6 +123,8 @@ void setup() {
   
 }
 
+// Draw training data points as circles
+// Color is based on which class each point is in.
 void drawTrainingData() {
   for (int i = 0; i < trainDataCount; i++) {
     if (labelTrain[i] == 1)
@@ -125,6 +140,8 @@ void drawTrainingData() {
   }
 }
 
+// Draw testing data as squares.
+// Color is based on the PREDICTED class.
 void drawTestData() {
   for (int i = 0; i < testDataCount; i++) {
     if (predictedLabelTest[i] == 1)
