@@ -1,0 +1,7 @@
+Quinn Stratton
+Prof. Michael Lewis
+Machine Learning
+
+This program takes a set of data describing the width and height measurements of different fruits and divides them into a set of training points and testing points. The program then uses the k-nearest neighbor algorithm (with k=1) to classify the testing points based on their Euclidean distance to the training points.
+The program classified the testng points with an accuracy of about 66%, a value which I believe could be improved by increasing the value of k slightly, or possibly by considering other features from the data.
+
