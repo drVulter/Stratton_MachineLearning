@@ -1,6 +1,6 @@
-Quinn Stratton
-Prof. Lewis
-Machine Learning Project 2
+# Machine Learning Project Two 
+## Quinn Stratton
+## Prof. Lewis
 
 This program is an extension of the one written for project1. In addition to
 performing the k-NN algorithm on the fruit dataset, the program now calculates
