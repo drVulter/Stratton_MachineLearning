@@ -1,0 +1,1846 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\froman\fcharset0 Times-Roman;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset0 LucidaGrande;
+\f3\ftech\fcharset77 Symbol;\f4\fnil\fcharset0 ArialUnicodeMS;\f5\fswiss\fcharset0 Helvetica;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl440\sa240\partightenfactor0
+
+\f0\fs37\fsmilli18667 \cf2 \expnd0\expndtw0\kerning0
+Less Hashing, Same Performance: Building a Better Bloom Filter 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 Adam Kirsch
+\f1\fs18\fsmilli9333 \up10 \uc0\u8902 
+\f0  
+\fs26\fsmilli13333 \up0 and Michael Mitzenmacher
+\f1\fs18\fsmilli9333 \up10 \uc0\u8902 \u8902 
+\f0  
+\fs24 \up0 \
+Division of Engineering and Applied Sciences Harvard University, Cambridge, MA 02138 \{kirsch, michaelm\}@eecs.harvard.edu \
+Abstract. A standard technique from the hashing literature is to use two hash functions h
+\fs16 \dn3 1
+\fs24 \up0 (x) and h
+\fs16 \dn3 2
+\fs24 \up0 (x) to simulate additional hash functions of the form g
+\fs16 \dn3 i
+\fs24 \up0 (x) = h
+\fs16 \dn3 1
+\fs24 \up0 (x) + ih
+\fs16 \dn3 2
+\fs24 \up0 (x). We demonstrate that this technique can be usefully applied to Bloom filters and related data structures. Specifically, only two hash functions are necessary to effectively imple- ment a Bloom filter without any loss in the asymptotic false positive probability. This leads to less computation and potentially less need for randomness in practice. \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 1 Introduction 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 A Bloom filter is a simple space-efficient randomized data structure for repre- senting a set in order to support membership queries. Although Bloom filters allow false positives, the space savings often outweigh this drawback. The Bloom filter and its many variations have proven increasingly important for many ap- plications (see, for example, the survey [3]). Although potential alternatives have been proposed [15], the Bloom filter\'92s simplicity, ease of use, and excellent per- formance make it a standard data structure that is and will continue to be of great use in many applications. For space reasons, we do not review the standard Bloom filter results; for more background, see [3]. 
+\fs24 \
+
+\fs26\fsmilli13333 In this paper, we show that applying a standard technique from the hash- ing literature can simplify the implementation of Bloom filters significantly. The idea is the following: two hash functions h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) and h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) can simulate more than two hash functions of the form g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x). (See, for example, Knuth\'92s discussion of open addressing with double hashing [11].) In our con- text i will range from 0 up to some number k \uc0\u8722  1 to give k hash functions, and the hash values are taken modulo the size of the relevant hash table. We demonstrate that this technique can be usefully applied to Bloom filters and related data structures. Specifically, only two hash functions are necessary to ef- fectively implement a Bloom filter without any increase in the asymptotic false positive probability. This leads to less computation and potentially less need 
+\fs24 \
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f1\fs16 \cf2 \up10 \uc0\u8902 
+\f0  
+\fs24 \up0 Supported in part by an NSF Graduate Research Fellowship, NSF grants CCR- 9983832 and CCR-0121154, and a grant from Cisco Systems. \
+
+\f1\fs16 \up10 \uc0\u8902 \u8902 
+\f0  
+\fs24 \up0 Supported in part by NSF grants CCR-9983832 and CCR-0121154 and a grant from Cisco Systems. \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 Y. Azar and T. Erlebach (Eds.): ESA 2006, LNCS 4168, pp. 456\'96467, 2006. 
+\f2 \uc0\u8413 
+\f0 c Springer-Verlag Berlin Heidelberg 2006 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page1image22752.png \width344 \height31
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  \
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 Less Hashing, Same Performance: Building a Better Bloom Filter 457 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 for randomness in practice. Specifically, in query-intensive applications where computationally non-trivial hash functions are used (such as in [5, 6]), hashing can be a potential bottleneck in using Bloom filters, and reducing the number of required hashes can yield an effective speedup. This improvement was found empirically in the work of Dillinger and Manolios [5, 6], who suggested using the hash functions g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) + i
+\fs18\fsmilli9333 \up10 2 
+\fs26\fsmilli13333 \up0 mod m, where m is the size of the hash table. 
+\fs24 \
+
+\fs26\fsmilli13333 Here we provide a full theoretical analysis that holds for a wide class of vari- ations of this technique, justifies and gives insight into the previous empirical observations, and is interesting in its own right. In particular, our methodology generalizes the standard asymptotic analysis of a Bloom filter, exposing a new convergence result that provides a common unifying intuition for the asymptotic false positive probabilities of the standard Bloom filter and the generalized class of Bloom filter variants that we analyze in this paper. We obtain this result by a surprisingly simple approach; rather than attempt to directly analyze the asymp- totic false positive probability, we formulate the initialization of the Bloom filter as a balls-and-bins experiment, prove a convergence result for that experiment, and then obtain the asymptotic false positive probability as a corollary. 
+\fs24 \
+
+\fs26\fsmilli13333 We start by analyzing a specific, somewhat idealized Bloom filter variation that provides the main insights and intuition for deeper results. We then move to a more general setting that covers several issues that might arise in practice, such as when the size of the hash table is a power of two as opposed to a prime. 
+\fs24 \
+
+\fs26\fsmilli13333 Because of space limitations, we leave some results in the full version of this paper [10]. For example, rate of convergence results appear in the full version [10], although in Section 6 we provide some experimental results showing that the asymptotics kick in quickly enough for this technique to be effective in practice. Also, in the full version we demonstrate the utility of this approach beyond the simple Bloom filter by showing how it can be used to reduce the number of hash functions required for Count-Min sketches [4], a variation of the Bloom filter idea used for keeping approximate counts of frequent items in data streams. 
+\fs24 \
+
+\fs26\fsmilli13333 Before beginning, we note that Luecker and Molodowitch [12] and Schmidt and Siegel [17] have shown that in the setting of open addressed hash tables, the double hashing technique gives the same performance as uniform hashing. These results are similar in spirit to ours, but the Bloom filter setting is suffi- ciently different from that of an open addressed hash table that we do not see a direct connection. We also note that our use of hash functions of the form g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) may appear similar to the use of pairwise independent hash functions, and that one might wonder whether there is any formal con- nection between the two techniques in the Bloom filter setting. Unfortunately, this is not the case; a straightforward modification of the standard Bloom filter analysis yields that if pairwise independent hash functions are used instead of fully random hash functions, then the space required to retain the same bound on the false positive probability increases by a constant factor. In contrast, we show that using the g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 \'92s causes no increase in the false positive probability, so they can truly be used as a replacement for fully random hash functions. 
+\fs24 \
+458 A. Kirsch and M. Mitzenmacher \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 2 A Simple Construction Using Two Hash Functions 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 As an instructive example case, we consider a specific application of the general technique described in the introduction. We devise a Bloom filter that uses k fully random hash functions on some universe U of items, each with range \{0,1,2,...,p \uc0\u8722  1\} for a prime p. Our hash table consists of m = kp bits; each hash function is assigned a disjoint subarray of p bits in the filter, that we treat as numbered \{0,1,2,...,p\u8722 1\}. Our k hash functions will be of the form g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) mod p, where h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) and h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) are two independent, uniform random hash functions on the universe with range \{0, 1, 2, . . . , p \uc0\u8722  1\}, and throughout we assume that i ranges from 0 to k \u8722  1. 
+\fs24 \
+
+\fs26\fsmilli13333 As with a standard partitioned Bloom filter, we fix some set S 
+\f3 \uc0\u8838 
+\f0  U and initialize the filter with S by first setting all of the bits to 0 and then, for each x 
+\f3 \uc0\u8712 
+\f0  S and i, setting the g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x)-th bit of the i-th subarray to 1. For any y 
+\f3 \uc0\u8712 
+\f0  U, we answer a query of the form \'93Is y 
+\f3 \uc0\u8712 
+\f0  S?\'94 with \'93Yes\'94 if and only if the g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (y)-th bit of the i-th subarray is 1 for every i. Thus, an item z \uc0\u824 
+\f3 \uc0\u8712 
+\f0  S generates a false positive if and only if each of its hash locations in the array is also a hash location for some x 
+\f3 \uc0\u8712 
+\f0  S. 
+\fs24 \
+
+\fs26\fsmilli13333 The advantage of our simplified setting is that for any two elements x,y 
+\f3 \uc0\u8712 
+\f0  U, exactly one of the following three cases occurs: g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) \uc0\u824 = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (y) for all i, or g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (y) for exactly one i, or g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (y) for all i. That is, because we have partitioned the bit array into disjoint hash tables, each hash function can be considered separately. Moreover, by working modulo p, we have arranged that if g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (y) for at least two values of i, then we must have h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (y) and h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x) = h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (y), so all hash values are the same. This codifies the intuition behind our result: the most likely way for a false positive to occur is when each element in the Bloom filter set S collides with at most one array bit corresponding to the element generating the false positive; other events that cause an element to generate a false positive occur with vanishing probability. It is this intuition that motivates our analysis; in Section 3, we consider more general cases where other non-trivial collisions can occur. 
+\fs24 \
+
+\fs26\fsmilli13333 Proceeding formally, we fix a set S = \{x
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 , x
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 , . . . , x
+\fs18\fsmilli9333 \dn3 n
+\fs26\fsmilli13333 \up0 \} of n elements from U and another element z 
+\f3 \uc0\u8712 
+\f0 / S, and compute the probability that z yields a false positive. A false positive corresponds to the event F that for each i there is (at least) one j such that g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (z) = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 ). Obviously, one way this can occur is if h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 ) = h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (z) and h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 ) = h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (z) for some j. The probability of this event E is 
+\fs24 \
+
+\fs26\fsmilli13333 Pr(E) = 1\uc0\u8722 \up21  \up0 1\uc0\u8722 1/p
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up21  
+\fs18\fsmilli9333 \up16 n 
+\fs26\fsmilli13333 \up0 = 1\uc0\u8722 \up21  \up0 1\uc0\u8722 k
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up0 /m
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up21  
+\fs18\fsmilli9333 \up16 n 
+\fs26\fsmilli13333 \up0 .\uc0\u8232 Notice that when m/n = c is a constant and k is a constant, as is standard for 
+\fs24 \
+
+\fs26\fsmilli13333 a Bloom filter, we have Pr(E) = o(1). Now since\uc0\u8232 Pr(F) = Pr(F | E) Pr(E) + Pr(F | \'acE) Pr(\'acE) 
+\fs24 \
+
+\fs26\fsmilli13333 = o(1) + Pr(F | \'acE)(1 \uc0\u8722  o(1)), 
+\fs24 \
+
+\fs26\fsmilli13333 it suffices to consider Pr(F | \'acE) to obtain the (constant) asymptotic false positive probability. 
+\fs24 \
+Less Hashing, Same Performance: Building a Better Bloom Filter 459 \
+
+\fs26\fsmilli13333 Conditioned on \'acE and (h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (z),h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (z)), the pair (h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 ),h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 )) is uniformly distributed over the p
+\fs18\fsmilli9333 \up10 2 
+\fs26\fsmilli13333 \up0 \uc0\u8722  1 values in V = \{0,...,p \u8722  1\}
+\fs18\fsmilli9333 \up10 2 
+\fs26\fsmilli13333 \up0 \uc0\u8722  \{(h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (z),h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (z))\}. Of these,foreachi
+\f3\fs18\fsmilli9333 \up10 \uc0\u8727 
+\f0  
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0 \{0,...,k\uc0\u8722 1\},thep\u8722 1pairsin 
+\fs24 \
+
+\fs26\fsmilli13333 V
+\fs18\fsmilli9333 \dn3 i
+\f3\fs13\fsmilli6667 \up0 \uc0\u8727 
+\f0  
+\fs26\fsmilli13333 =\{(a,b)
+\f3 \uc0\u8712 
+\f0 V : a
+\f3 \uc0\u8801 
+\f0 i
+\f3\fs18\fsmilli9333 \up10 \uc0\u8727 
+\f0\fs26\fsmilli13333 \up0 (h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (z)\uc0\u8722 b)+h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (z)modp, b\uc0\u824 
+\f3 \uc0\u8801 
+\f0 h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (z)modp\} 
+\fs24 \
+
+\fs26\fsmilli13333 are the ones such that if (h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j 
+\fs26\fsmilli13333 \up0 ), h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j 
+\fs26\fsmilli13333 \up0 )) 
+\f3 \uc0\u8712 
+\f0  V
+\fs18\fsmilli9333 \dn3 i
+\f3\fs13\fsmilli6667 \up0 \uc0\u8727 
+\f0  
+\fs26\fsmilli13333 , then i
+\f3\fs18\fsmilli9333 \up10 \uc0\u8727 
+\f0  
+\fs26\fsmilli13333 \up0 is the unique value of i such that g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x
+\fs18\fsmilli9333 \dn3 j
+\fs26\fsmilli13333 \up0 ) = g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (z). We can therefore view the conditional probability as a variant of a balls-and-bins problem. There are n balls (each corresponding to some x
+\fs18\fsmilli9333 \dn3 j 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  S), and k bins (each corresponding to some i
+\f3\fs18\fsmilli9333 \up10 \uc0\u8727 
+\f0  
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  \{0,...,k\uc0\u8722 1\}). With probability k(p \u8722  1)/(p
+\fs18\fsmilli9333 \up10 2 
+\fs26\fsmilli13333 \up0 \uc0\u8722  1) = k/(p + 1) a ball lands in a bin, and with the remaining probability it is discarded; when a ball lands in a bin, the bin it lands in is chosen uniformly at random. What is the probability that all of the bins have at least one ball? 
+\fs24 \
+
+\fs26\fsmilli13333 This question is surprisingly easy to answer. By the Poisson approximation, the total number of balls that are not discarded has distribution Bin(n, k/(p + 1)) \uc0\u8776  Po(k
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up0 /c), where Bin(\'b7, \'b7) and Po(\'b7) denote the binomial and Poisson distri- butions, respectively. Since each ball that is not discarded lands in a bin chosen at random, the joint distribution of the number of balls in the bins is asymp- totically the same as the joint distribution of k independent Po(k/c) random variables, by a standard property of Poisson random variables. The probability that each bin has a least one ball now clearly converges to 
+\fs24 \
+
+\fs26\fsmilli13333 Pr(Po(k/c) > 0)
+\fs18\fsmilli9333 \up10 k 
+\fs26\fsmilli13333 \up0 = (1 \uc0\u8722  exp[\u8722 k/c])
+\fs18\fsmilli9333 \up13 k 
+\fs26\fsmilli13333 \up0 , 
+\fs24 \
+
+\fs26\fsmilli13333 which is the asymptotic false positive probability for a standard Bloom filter, completing the analysis. 
+\fs24 \
+
+\fs26\fsmilli13333 We make the above argument much more general and rigorous in Section 3, but for now we emphasize that we have actually characterized much more than just the false positive probability of our Bloom filter variant. In fact, we have characterized the asymptotic joint distribution of the number of items in S hash- ing to the locations used by some z \uc0\u824 
+\f3 \uc0\u8712 
+\f0  S as being independent Po(k/c) random variables. Furthermore, from a technical perspective, this approach appears fairly robust. In particular, the above analysis uses only the facts that the probability that some x 
+\f3 \uc0\u8712 
+\f0  S shares more than one of z\'92s hash locations is o(1), and that if some x 
+\f3 \uc0\u8712 
+\f0  S shares exactly one of z\'92s hash locations, then that hash loca- tion is nearly uniformly distributed over z\'92s hash locations. These observations suggest that the techniques used in this section can be generalized to handle a much wider class of Bloom filter variants, and form the intuitive basis for the arguments in Section 3. 
+\fs24 \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 3 A General Framework 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 In this section, we introduce a general framework for analyzing Bloom filter vari- ants, such as the one examined in Section 2. We start with some new notation. For any integer l, we define the set [l] = \{0,1,...,l \uc0\u8722  1\} (note that this defini- tion is slightly non-standard). We denote the support of a random variable X 
+\fs24 \
+460 A. Kirsch and M. Mitzenmacher \
+
+\fs26\fsmilli13333 by Supp(X). For a multi-set M, we use |M| to denote the number of distinct elements of M, and 
+\f1 \uc0\u8741 
+\f0 M
+\f1 \uc0\u8741 
+\f0  to denote the number of elements of M with multi- plicity. For two multi-sets M and M
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 , we define M 
+\f3 \uc0\u8745 
+\f0  M
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 and M 
+\f3 \uc0\u8746 
+\f0  M
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 to be, respectively, the intersection and union of M
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 as multi-sets. Furthermore, in an abuse of standard notation, we define the statement i, i 
+\f3 \uc0\u8712 
+\f0  M as meaning that i is an element of M of multiplicity at least 2. 
+\fs24 \
+
+\fs26\fsmilli13333 We are now ready to define the framework. As before, U denotes the universe of items and S 
+\f3 \uc0\u8838 
+\f0  U denotes the set of n items for which the Bloom filter will answer membership queries. We define a scheme to be a method of assigning hash locations to every element of U. Formally, a scheme is specified by a joint distribution of discrete random variables \{H(u) : u 
+\f3 \uc0\u8712 
+\f0  U\} (implicitly parameter- ized by n), where for u 
+\f3 \uc0\u8712 
+\f0  U, H(u) represents the multi-set of hash-locations assigned to u by the scheme. We do not require a scheme to be defined for every value of n, but we do insist that it be defined for infinitely many val- ues of n, so that we may take limits as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734 . For example, for the class of schemes discussed in Section 2, we think of the constants k and c as being 
+\fs24 \
+
+\fs26\fsmilli13333 fixed to give a particular scheme that is defined for those values of n such that 
+\fs13\fsmilli6667 def def 
+\fs24 \
+
+\fs26\fsmilli13333 p = m/k is a prime, where m = cn. Since there are infinitely many primes, the asymptotic behavior of this scheme as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734  is well-defined and is the same as in Section 2, where we let m be a free parameter and analyzed the behav- ior as n,m 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734  subject to m/n and k being fixed constants, and m/k being prime. 
+\fs24 \
+
+\fs26\fsmilli13333 Having defined the notion of a scheme, we may now formalize some important concepts with new notation (all of which is implicitly parameterized by n). We define H to be the set of all hash locations that can be assigned by the scheme (formally, H is the set of elements that appear in some multi-set in the support of H(u), for some u 
+\f3 \uc0\u8712 
+\f0  U). For x 
+\f3 \uc0\u8712 
+\f0  S and z 
+\f3 \uc0\u8712 
+\f0  U\uc0\u8722 S, define C(x,z) = H(x)
+\f3 \uc0\u8745 
+\f0 H(z) to be the multi-set of hash collisions of x with z. We let F(z) denote the false positive event for z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722  S, which occurs when each of z\'92s hash locations is also a hash location for some x 
+\f3 \uc0\u8712 
+\f0  S. 
+\fs24 \
+
+\fs26\fsmilli13333 In the schemes that we consider, \{H(u) : u 
+\f3 \uc0\u8712 
+\f0  U\} will always be independent and identically distributed. In this case, Pr(F(z)) is the same for all z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722 S, as is the joint distribution of \{C(x, z) : x 
+\f3 \uc0\u8712 
+\f0  S\}. Thus, to simplify the notation, we may fix an arbitrary z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722 S and simply use Pr(F) instead of Pr(F(z)) to denote the false positive probability, and we may use \{C(x) : x 
+\f3 \uc0\u8712 
+\f0  S\} instead of \{C(x, z) : x 
+\f3 \uc0\u8712 
+\f0  S\} to denote the joint probability distribution of the multi-sets of hash collisions of elements of S with z. 
+\fs24 \
+
+\fs26\fsmilli13333 The main technical result of this section is the following key theorem, which is a formalization and generalization of the analysis in Section 2. 
+\fs24 \
+
+\fs26\fsmilli13333 Theorem 1. Fix a scheme. Suppose that there are constants \uc0\u955  and k such that: 
+\fs24 \
+
+\fs26\fsmilli13333 1. \{H(u) : u 
+\f3 \uc0\u8712 
+\f0  U\} are independent and identically distributed. 2. For u 
+\f3 \uc0\u8712 
+\f0  U, 
+\f1 \uc0\u8741 
+\f0 H(u)
+\f1 \uc0\u8741 
+\f0  = k. 
+\fs24 \
+
+\fs26\fsmilli13333 H(z), so the 
+\fs24 \
+\
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \dn8 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs26\fsmilli13333 \up0 t
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 X
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x)\'92s are too, since each is a function of the corresponding 
+\fs24 \
+Less Hashing, Same Performance: Building a Better Bloom Filter 461 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\f3\fs26\fsmilli13333 \cf2 \up21 \uc0\u9127 \up0 \uc0\u9128 
+\f0  1 \uc0\u8722  
+\fs18\fsmilli9333 \up10 \uc0\u955  
+\fs26\fsmilli13333 \up0 + o ( 1 / n ) i = 0 
+\fs18\fsmilli9333 n 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page6image4056.png \width61 \height15
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 3. For x 
+\f3 \uc0\u8712 
+\f0  S, Pr(
+\f1 \uc0\u8741 
+\f0 C(x)
+\f1 \uc0\u8741 
+\f0  = i) = 
+\fs18\fsmilli9333 \up10 \uc0\u955  
+\fs26\fsmilli13333 \up0 + o(1/n) i = 1 . 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page6image4056.png \width61 \height15
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\f3\fs26\fsmilli13333 \cf2 \dn3 \uc0\u9129 
+\f0\fs18\fsmilli9333 \up2 n\up0 \uc0\u8232 
+\fs26\fsmilli13333 4. Forx
+\f3 \uc0\u8712 
+\f0 S,max
+\fs18\fsmilli9333 \dn3 i
+\f3 \uc0\u8712 
+\f0 H 
+\fs26\fsmilli13333 \up0 Pr(i
+\f3 \uc0\u8712 
+\f0 C(x)|
+\f1 \uc0\u8741 
+\f0 C(x)
+\f1 \uc0\u8741 
+\f0 =1, i
+\f3 \uc0\u8712 
+\f0 H(z))\uc0\u8722 
+\fs18\fsmilli9333 \up10 1 
+\fs26\fsmilli13333 \up0 =o(1). 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 \uc0\u8232 Then lim
+\fs18\fsmilli9333 \dn3 n
+\f3 \uc0\u8594 
+\f0 \uc0\u8734  
+\fs26\fsmilli13333 \up0 Pr(F) = 1 \uc0\u8722  e
+\fs18\fsmilli9333 \up10 \uc0\u8722 \u955 /k
+\fs26\fsmilli13333 \up21  
+\fs18\fsmilli9333 \up16 k 
+\fs26\fsmilli13333 \up0 . 
+\fs24 \
+
+\fs26\fsmilli13333 o(1/n) i>1 
+\fs18\fsmilli9333 k 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page6image7640.png \width58 \height14
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 Proof. For ease of exposition, we assign every element of H(z) a unique number in [k] (treating multiple instances of the same hash location as distinct elements). More formally, we define an arbitrary bijection f
+\fs18\fsmilli9333 \dn3 M 
+\fs26\fsmilli13333 \up0 from M to [k] for every multi- set M 
+\f3 \uc0\u8838 
+\f0  H with 
+\f1 \uc0\u8741 
+\f0 M
+\f1 \uc0\u8741 
+\f0  = k (where f
+\fs18\fsmilli9333 \dn3 M 
+\fs26\fsmilli13333 \up0 treats multiple instances of the same hash location in M as distinct elements), and label the elements of H(z) according to f
+\fs18\fsmilli9333 \dn6 H(z)
+\fs26\fsmilli13333 \up0 . This convention allows us to identify the elements of H(z) by numbers i 
+\f3 \uc0\u8712 
+\f0  [k], rather than hash locations i 
+\f3 \uc0\u8712 
+\f0  H. 
+\fs24 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 def 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 converges in distribution to a vector P = (P
+\fs18\fsmilli9333 \dn3 0 
+\fs26\fsmilli13333 \up0 , . . . , P
+\fs18\fsmilli9333 \dn3 k\uc0\u8722 1 
+\fs26\fsmilli13333 \up0 ) of k independent 
+\fs24 \
+
+\fs26\fsmilli13333 Po(\uc0\u955 /k) random variables as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734 . To do this, we make use of moment 
+\fs24 \
+
+\fs26\fsmilli13333 generating functions. For a random variable R, the moment generating func- 
+\fs24 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 def 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 tion of R is defined by M
+\fs18\fsmilli9333 \dn3 R
+\fs26\fsmilli13333 \up0 (t) = \dn3 E\up0 [exp(tR)]. We show that for any t
+\fs18\fsmilli9333 \dn3 0
+\fs26\fsmilli13333 \up0 ,...,t
+\fs18\fsmilli9333 \dn3 k
+\fs26\fsmilli13333 \up0 , 
+\fs24 \
+
+\fs26\fsmilli13333 For i 
+\f3 \uc0\u8712 
+\f0  [k] and x 
+\f3 \uc0\u8712 
+\f0  S, define X
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x) = 1 if i 
+\f3 \uc0\u8712 
+\f0  C(x) and 0 otherwise, and 
+\fs13\fsmilli6667 def 
+\fs24 \
+
+\fs26\fsmilli13333 define X
+\fs18\fsmilli9333 \dn3 i 
+\fs26\fsmilli13333 \up0 = 
+\fs18\fsmilli9333 \dn8 x
+\f3 \uc0\u8712 
+\f0 S 
+\fs26\fsmilli13333 \up0 X
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (x). Note that i 
+\f3 \uc0\u8712 
+\f0  C(x) is an abuse of notation; what we really mean is f
+\fs18\fsmilli9333 \up10 \uc0\u8722 1 
+\fs26\fsmilli13333 \up0 (i) 
+\f3 \uc0\u8712 
+\f0  C(x), although we will continue using the for- 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 H(z)\uc0\u8232 
+\fs26\fsmilli13333 mer since it is much less cumbersome. We show that X = (X
+\fs18\fsmilli9333 \dn3 0
+\fs26\fsmilli13333 \up0 ,...,X
+\fs18\fsmilli9333 \dn3 k\uc0\u8722 1
+\fs26\fsmilli13333 \up0 ) 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 lim
+\fs18\fsmilli9333 \dn3 n
+\f3 \uc0\u8594 
+\f0 \uc0\u8734  
+\fs26\fsmilli13333 \up0 M
+\fs18\fsmilli9333 \up5  
+\fs13\fsmilli6667 \up0 k\uc0\u8722 1 
+\fs18\fsmilli9333 \dn8 t
+\fs13\fsmilli6667 \dn11 i 
+\fs18\fsmilli9333 \dn8 X
+\fs13\fsmilli6667 \dn11 i 
+\fs26\fsmilli13333 \up0 (t
+\fs18\fsmilli9333 \dn3 k 
+\fs26\fsmilli13333 \up0 ) = M
+\fs18\fsmilli9333 \up5  
+\fs13\fsmilli6667 \up0 k\uc0\u8722 1 i=0 i=0 
+\fs24 \
+
+\fs26\fsmilli13333 and p. 390], since M
+\fs18\fsmilli9333 \up5  
+\fs13\fsmilli6667 \up0 k\uc0\u8722 1 
+\fs26\fsmilli13333 (t
+\fs18\fsmilli9333 \dn3 k
+\fs26\fsmilli13333 \up0 ) 
+\fs13\fsmilli6667 \dn3 i=0 
+\fs18\fsmilli9333 \up2 t
+\fs13\fsmilli6667 \up0 i 
+\fs18\fsmilli9333 \up2 P
+\fs13\fsmilli6667 \up0 i 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \dn8 t
+\fs13\fsmilli6667 \dn11 i 
+\fs18\fsmilli9333 \dn8 P
+\fs13\fsmilli6667 \dn11 i 
+\fs26\fsmilli13333 \up0 (t
+\fs18\fsmilli9333 \dn3 k 
+\fs26\fsmilli13333 \up0 ), which is sufficient by [1, Theorem 29.4 
+\fs24 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs18\fsmilli9333 \up5 t
+\fs13\fsmilli6667 \up2 i
+\fs18\fsmilli9333 \up5 X
+\fs13\fsmilli6667 \up2 i 
+\fs18\fsmilli9333 \up8 k 
+\fs13\fsmilli6667 \up0 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs18\fsmilli9333 \up5 t
+\fs13\fsmilli6667 \up2 i 
+\fs24 \up0 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 \dn3 x
+\f3 \uc0\u8712 
+\f0 S 
+\fs18\fsmilli9333 \up2 X
+\fs13\fsmilli6667 \up0 i
+\fs18\fsmilli9333 \up2 (x) 
+\fs24 \up0 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \up8 k 
+\fs13\fsmilli6667 \up0 x
+\f3 \uc0\u8712 
+\f0 S 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 = exp 
+\fs18\fsmilli9333 \up10 \uc0\u955  \up0 k 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 \dn8 e
+\fs18\fsmilli9333 \up2 t
+\fs13\fsmilli6667 \up0 k
+\fs18\fsmilli9333 \up2 t
+\fs13\fsmilli6667 \up0 i 
+\fs26\fsmilli13333 \dn8 \uc0\u8722 1 \up0 (t ) = M
+\fs18\fsmilli9333 \up8  
+\fs24 \up0 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 < \uc0\u8734 , by an easy (t ) 
+\fs24 \
+
+\fs26\fsmilli13333 = M
+\fs18\fsmilli9333 \up8  \up0 \uc0\u8232 
+\fs26\fsmilli13333 where the first two steps are obvious, and the third step follows from the fact that 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 t
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 X
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 (x)
+\fs26\fsmilli13333 \up5 (t
+\fs18\fsmilli9333 \up0 k
+\fs26\fsmilli13333 \up5 ) ,\up0 \uc0\u8232 the H(x)\'92s are independent and identically distributed (for x 
+\f3 \uc0\u8712 
+\f0  S) conditioned on 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 H(x). Continuing, we have (as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734 ) 
+\fs18\fsmilli9333 \dn6 n 
+\fs24 \up0 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 \dn6 M
+\fs18\fsmilli9333 \up5  
+\fs24 \up0 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 t
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 X
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 (x)
+\fs26\fsmilli13333 \up5 (t
+\fs18\fsmilli9333 \up0 k
+\fs26\fsmilli13333 \up5 ) \up0 Pr(
+\f1 \uc0\u8741 
+\f0 C(x)
+\f1 \uc0\u8741 
+\f0  = 0) + 
+\fs24 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 = 
+\fs24 \
+
+\fs26\fsmilli13333 \uc0\u955 \u8232 = 1\u8722 \dn19 n\up0 + 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\f3\fs26\fsmilli13333 \cf2 \dn14 \uc0\u8594 
+\f0 e
+\fs18\fsmilli9333 \up0 \uc0\u8722 \u955 +
+\fs13\fsmilli6667 \up8 \uc0\u955  
+\fs18\fsmilli9333 \up0 \uc0\u8232 
+\fs13\fsmilli6667 k i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 Pr(
+\f1 \uc0\u8741 
+\f0 C(x)
+\f1 \uc0\u8741 
+\f0  = j) 
+\fs24 \
+
+\fs26\fsmilli13333 \'d7 
+\fs24 \
+
+\fs26\fsmilli13333 (T) | 
+\f1 \uc0\u8741 
+\f0 C(x)
+\f1 \uc0\u8741 
+\f0  = j)e
+\fs18\fsmilli9333 \up10 t
+\fs13\fsmilli6667 \up8 k 
+\fs24 \up0 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 \dn6 i
+\f3 \uc0\u8712 
+\f0 T 
+\fs18\fsmilli9333 \up0 t
+\fs13\fsmilli6667 i 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 H(z) \dn3 n 
+\fs24 \up0 \
+
+\fs18\fsmilli9333 T 
+\f3 \uc0\u8838 
+\f0 [k]:|T |=j 
+\fs26\fsmilli13333 \up5 \uc0\u955  
+\fs18\fsmilli9333 \dn6 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs26\fsmilli13333 \up5 e
+\fs18\fsmilli9333 \up13 t
+\fs13\fsmilli6667 \up10 k
+\fs18\fsmilli9333 \up13 t
+\fs13\fsmilli6667 \up10 i 
+\fs24 \up0 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \up5 k 
+\fs24 \up0 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 j=1\uc0\u8232 
+\fs26\fsmilli13333 Pr(C(x) = f
+\fs18\fsmilli9333 \up10 \uc0\u8722 1 
+\fs24 \up0 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \dn3 n 
+\fs24 \up0 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 \dn19 kn \up0 +o(1/n) 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 e
+\fs13\fsmilli6667 \up8 t\up2 k\up8 t\up2 i 
+\fs26\fsmilli13333 \dn14 =e
+\fs13\fsmilli6667 \up8 \uc0\u955 
+\fs26\fsmilli13333 \dn3 (
+\fs18\fsmilli9333 \up13  
+\fs26\fsmilli13333 \dn3 (
+\fs18\fsmilli9333 \up0 e
+\fs13\fsmilli6667 \up8 t\up2 k\up8 t\up2 i
+\fs18\fsmilli9333 \up0 \uc0\u8722 1
+\fs26\fsmilli13333 \dn3 ))\dn14 =M
+\fs18\fsmilli9333 \dn3  
+\fs13\fsmilli6667 \up0 k i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs24 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 t
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 Po
+\fs13\fsmilli6667 \dn3 i
+\fs18\fsmilli9333 \up0 (\uc0\u955 
+\fs13\fsmilli6667 \dn3 k
+\fs18\fsmilli9333 \up0 ) 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 (t ). 
+\fs18\fsmilli9333 k 
+\fs24 \
+\
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \dn6 n 
+\fs13\fsmilli6667 \up0 def 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page6image41312.png \width60 \height15
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 calculation. Proceeding, we write M
+\fs18\fsmilli9333 \up8  
+\fs26\fsmilli13333 \up0 (t ) = M
+\fs18\fsmilli9333 \up8  
+\fs24 \up0 \
+\pard\pardeftab720\sl160\sa240\partightenfactor0
+
+\fs13\fsmilli6667 \cf2 \dn3 i
+\f3 \uc0\u8712 
+\f0 [k] 
+\fs18\fsmilli9333 \up2 t
+\fs13\fsmilli6667 \up0 i
+\fs18\fsmilli9333 \up2 X
+\fs13\fsmilli6667 \up0 i
+\fs18\fsmilli9333 \up2 (x)
+\fs26\fsmilli13333 \dn19  
+\fs18\fsmilli9333 \up2 k \up0 n 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 i
+\f3 \uc0\u8712 
+\f0 k 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page6image43416.png \width67 \height16
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page6image43584.png \width344 \height31
+}¬} {{\NeXTGraphic page6image43752.png \width49 \height12
+}¬} {{\NeXTGraphic page6image43752.png \width49 \height12
+}¬} \
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 462 A. Kirsch and M. Mitzenmacher \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The first step follows from the definition of the moment generating function. The second step follows from the assumptions on the distribution of C(x) (the conditioning on i 
+\f3 \uc0\u8712 
+\f0  H(z) is implicit in our convention that associates integers in [k] with the elements of H(z)). The next two steps are obvious, and the last step follows from a previous computation. 
+\fs24 \
+
+\fs26\fsmilli13333 We have now established that X
+\fs18\fsmilli9333 \up10 n 
+\fs26\fsmilli13333 \up0 converges to P in distribution as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734 . Standard facts from probability theory [1] now imply that as n 
+\f3 \uc0\u8594 
+\f0  \uc0\u8734 , 
+\fs24 \
+\pard\pardeftab720\sl200\sa240\partightenfactor0
+
+\fs18\fsmilli9333 \cf2 \dn6 k 
+\fs26\fsmilli13333 \up0 Pr(F)=Pr(
+\f3 \uc0\u8704 
+\f0 i
+\f3 \uc0\u8712 
+\f0 [k],X
+\fs18\fsmilli9333 \dn3 i 
+\fs26\fsmilli13333 \up0 >0)
+\f3 \uc0\u8594 
+\f0 Pr(
+\f3 \uc0\u8704 
+\f0 i
+\f3 \uc0\u8712 
+\f0 [k],P
+\fs18\fsmilli9333 \dn3 i 
+\fs26\fsmilli13333 \up0 >0)= 1\uc0\u8722 e
+\fs18\fsmilli9333 \up10 \uc0\u8722 \u955 /k 
+\fs26\fsmilli13333 \up0 . 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 \uc0\u8851 \u8852 
+\f0  
+\fs24 \
+
+\fs26\fsmilli13333 It turns out that the conditions of Theorem 1 can be verified very easily in many cases. 
+\fs24 \
+
+\fs26\fsmilli13333 Lemma 1. Fix a scheme. Suppose that there are constants \uc0\u955  and k such that: 
+\fs24 \
+
+\fs26\fsmilli13333 1. \{H(u) : u 
+\f3 \uc0\u8712 
+\f0  U\} are independent and identically distributed. 
+\fs24 \
+
+\fs26\fsmilli13333 4. For u 
+\f3 \uc0\u8712 
+\f0  U, max
+\fs18\fsmilli9333 \dn3 i
+\fs13\fsmilli6667 \dn6 1
+\fs18\fsmilli9333 \dn3 ,i
+\fs13\fsmilli6667 \dn6 2
+\f3\fs18\fsmilli9333 \dn3 \uc0\u8712 
+\f0 H 
+\fs26\fsmilli13333 \up0 Pr(i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 ,i
+\fs18\fsmilli9333 \dn3 2 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  H(u)) = o(1/n).\uc0\u8232 5. The set of all possible hash locations H satisfies |H| = O(n). 
+\fs24 \
+
+\fs26\fsmilli13333 Then the conditions of Theorem 1 hold (with the same values for \uc0\u955  and k), and so the conclusion does as well. 
+\fs24 \
+
+\fs26\fsmilli13333 Remark 1. Recall that, under our notation, the statement i,i 
+\f3 \uc0\u8712 
+\f0  H(u) is true if and only if i is an element of H(u) of multiplicity at least 2. 
+\fs24 \
+
+\fs26\fsmilli13333 Proof. The proof is essentially just a number of applications of the first two Boole-Bonferroni inequalities. For details, see [10]. 
+\fs24 \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 4 Some Specific Schemes 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 We are now ready to analyze some specific schemes. In particular, we examine a natural generalization of the scheme described in Section 2, as well as the double hashing and extended double hashing schemes introduced in [5,6]. In both of these cases, we consider a Bloom filter consisting of an array of m = cn bits and k hash functions, where c > 0 and k \uc0\u8805  1 are fixed constants. The nature of the hash functions depends on the particular scheme under consideration. 
+\fs24 \
+
+\fs26\fsmilli13333 4.1 Partition Schemes 
+\fs24 \
+
+\fs26\fsmilli13333 First, we consider the class of partition schemes, where the Bloom filter is defined by an array of m bits that is partitioned into k disjoint arrays of m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 = m/k bits (we require that m be divisible by k), and an item u 
+\f3 \uc0\u8712 
+\f0  U is hashed to location 
+\fs24 \
+
+\fs26\fsmilli13333 h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u) mod m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs24 \up0 \
+
+\fs26\fsmilli13333 2. For u 
+\f3 \uc0\u8712 
+\f0  U, 
+\f1 \uc0\u8741 
+\f0 H(u)
+\f1 \uc0\u8741 
+\f0  = k. 
+\fs24 \
+
+\fs26\fsmilli13333 3. For u
+\f3 \uc0\u8712 
+\f0 U, max Pr(i
+\f3 \uc0\u8712 
+\f0 H(u))\uc0\u8722  
+\fs18\fsmilli9333 \up10 \uc0\u955  
+\fs26\fsmilli13333 \up0 =o(1/n). 
+\fs18\fsmilli9333 i
+\f3 \uc0\u8712 
+\f0 H \dn6 kn 
+\fs24 \up0 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page7image23168.png \width94 \height18
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  \
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 Less Hashing, Same Performance: Building a Better Bloom Filter 463 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 of array i, for i 
+\f3 \uc0\u8712 
+\f0  [k], where h
+\fs18\fsmilli9333 \dn3 1 
+\fs26\fsmilli13333 \up0 and h
+\fs18\fsmilli9333 \dn3 2 
+\fs26\fsmilli13333 \up0 are independent fully random hash functions with codomain [m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 ]. Note that the scheme analyzed in Section 2 is a partition scheme where m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 is prime (and so is denoted by p in Section 2). 
+\fs24 \
+
+\fs26\fsmilli13333 Unless otherwise stated, henceforth we do all arithmetic involving h
+\fs18\fsmilli9333 \dn3 1 
+\fs26\fsmilli13333 \up0 and h
+\fs18\fsmilli9333 \dn3 2 
+\fs26\fsmilli13333 \up0 modulo m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 . We prove the following theorem concerning partition schemes. 
+\fs24 \
+
+\fs26\fsmilli13333 Theorem 2. For a partition scheme, lim
+\fs18\fsmilli9333 \dn3 n
+\f3 \uc0\u8594 
+\f0 \uc0\u8734  
+\fs26\fsmilli13333 \up0 Pr(F) = 1 \uc0\u8722  e
+\fs18\fsmilli9333 \up10 \uc0\u8722 k/c
+\fs26\fsmilli13333 \up21  
+\fs18\fsmilli9333 \up16 k 
+\fs26\fsmilli13333 \up0 . 
+\fs24 \
+
+\fs26\fsmilli13333 Proof. We show that the H(u)\'92s satisfy the conditions of Lemma 1 with \uc0\u955  = k
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up0 /c. For i 
+\f3 \uc0\u8712 
+\f0  [k] and u 
+\f3 \uc0\u8712 
+\f0  U, define g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (u) = (i,h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u)) and H(u) = (g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (u) : i 
+\f3 \uc0\u8712 
+\f0  [k]). That is, g
+\fs18\fsmilli9333 \dn3 i
+\fs26\fsmilli13333 \up0 (u) is u\'92s ith hash location, and H(u) is the multi-set of u\'92s hash locations. This notation is obviously consistent with the definitions required by Lemma 1. 
+\fs24 \
+
+\fs26\fsmilli13333 Since h
+\fs18\fsmilli9333 \dn3 1 
+\fs26\fsmilli13333 \up0 and h
+\fs18\fsmilli9333 \dn3 2 
+\fs26\fsmilli13333 \up0 are independent and fully random, the first two conditions are trivial. The last condition is also trivial, since there are m = cn possible hash locations. For the remaining two conditions, fix u 
+\f3 \uc0\u8712 
+\f0  U. Observe that for (i, r) 
+\f3 \uc0\u8712 
+\f0  [k] \'d7 [m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 ], 
+\fs24 \
+
+\fs26\fsmilli13333 Pr((i, r) 
+\f3 \uc0\u8712 
+\f0  H(u)) = Pr(h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) = r \uc0\u8722  ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u)) = 1/m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \up0 = (k
+\fs18\fsmilli9333 \up10 2
+\fs26\fsmilli13333 \up0 /c)/kn, and that for distinct (i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 , r
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 ), (i
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 , r
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 ) 
+\f3 \uc0\u8712 
+\f0  [k] \'d7 [m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 ], we have 
+\fs24 \
+
+\fs26\fsmilli13333 Pr((i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 , r
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 ), (i
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 , r
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 ) 
+\f3 \uc0\u8712 
+\f0  H(u))\uc0\u8232 = Pr(i
+\fs18\fsmilli9333 \dn3 1 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  H(u)) Pr(i
+\fs18\fsmilli9333 \dn3 2 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  H(u) | i
+\fs18\fsmilli9333 \dn3 1 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  H(u)) 
+\fs24 \
+
+\fs26\fsmilli13333 = \up18 1 \up0 Pr(h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) = r
+\fs18\fsmilli9333 \dn3 2 
+\fs26\fsmilli13333 \up0 \uc0\u8722  i
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u) | h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) = r
+\fs18\fsmilli9333 \dn3 1 
+\fs26\fsmilli13333 \up0 \uc0\u8722  i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u)) \dn3 m
+\f3\fs18\fsmilli9333 \up2 \uc0\u8242 
+\f0  
+\fs24 \up0 \
+
+\fs26\fsmilli13333 = \up18 1 \up0 Pr((i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 \uc0\u8722 i
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 )h
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u)=r
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 \uc0\u8722 r
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 ) \dn3 m
+\f3\fs18\fsmilli9333 \up2 \uc0\u8242 
+\f0  
+\fs24 \up0 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 \dn19 \uc0\u8804  \up0 1 \dn19 \'b7\up0 gcd(|i
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 \uc0\u8722 i
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 |,m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 )\dn19 \uc0\u8804  \up0 k \dn19 =o(1/n), \dn3 m
+\f3\fs18\fsmilli9333 \up2 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \dn3 m
+\f3\fs18\fsmilli9333 \up2 \uc0\u8242 
+\f0  
+\fs26\fsmilli13333 \dn3 (m
+\f3\fs18\fsmilli9333 \up2 \uc0\u8242 
+\f0\fs26\fsmilli13333 \dn3 )
+\fs18\fsmilli9333 \up2 2 
+\fs24 \up0 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 where the fourth step is the only nontrivial step, and it follows from the standard fact that for any r, s 
+\f3 \uc0\u8712 
+\f0  [m], there are at most gcd(r, m) values t 
+\f3 \uc0\u8712 
+\f0  [m] such that rt 
+\f3 \uc0\u8801 
+\f0  s mod m (see, for example, [9, Proposition 3.3.1]). Finally, since it is clear that from the definition of the scheme that |H(u)| = k for all u 
+\f3 \uc0\u8712 
+\f0  U, we have thatforany(i,r)
+\f3 \uc0\u8712 
+\f0 [k]\'d7[m
+\f3\fs18\fsmilli9333 \up10 \uc0\u8242 
+\f0\fs26\fsmilli13333 \up0 ],Pr((i,r),(i,r)
+\f3 \uc0\u8712 
+\f0 H(u))=0. 
+\f1 \uc0\u8852 \u8851 
+\f0  
+\fs24 \
+
+\fs26\fsmilli13333 4.2 (Extended) Double Hashing Schemes 
+\fs24 \
+
+\fs26\fsmilli13333 Next, we consider the class of double hashing and extended double hashing schemes, which are analyzed empirically in [5,6]. In these schemes, an item u 
+\f3 \uc0\u8712 
+\f0  U is hashed to location 
+\fs24 \
+
+\fs26\fsmilli13333 h
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 (u) + ih
+\fs18\fsmilli9333 \dn3 2
+\fs26\fsmilli13333 \up0 (u) + f(i) mod m 
+\fs24 \
+
+\fs26\fsmilli13333 of the array of m bits, for i 
+\f3 \uc0\u8712 
+\f0  [k], where h
+\fs18\fsmilli9333 \dn3 1 
+\fs26\fsmilli13333 \up0 and h
+\fs18\fsmilli9333 \dn3 2 
+\fs26\fsmilli13333 \up0 are independent fully random hash functions with codomain [m], and f : [k] 
+\f3 \uc0\u8594 
+\f0  [m] is an arbitrary function. 
+\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page8image23264.png \width105 \height21
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page8image23264.png \width105 \height21
+}¬} {{\NeXTGraphic page8image23264.png \width105 \height21
+}¬} {{\NeXTGraphic page8image23768.png \width425 \height32
+}¬} {{\NeXTGraphic page8image23936.png \width192 \height24
+}¬} \
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 464 A. Kirsch and M. Mitzenmacher \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 When f(i) 
+\f3 \uc0\u8801 
+\f0  0, the scheme is called a double hashing scheme. Otherwise, it is called an extended double hashing scheme (with f). We show that the asymptotic false positive probability for an (extended) double hashing scheme is the same as for a standard Bloom filter. The proof is analogous to the proof of Theorem 2. For details, see the technical report version of this paper [10]. 
+\fs24 \
+
+\fs26\fsmilli13333 Theorem 3. For any (extended) double hashing scheme, 
+\fs18\fsmilli9333 \dn6 k 
+\fs24 \up0 \
+
+\fs26\fsmilli13333 lim Pr(F)= 1\uc0\u8722 e
+\fs18\fsmilli9333 \up10 \uc0\u8722 k/c 
+\fs26\fsmilli13333 \up0 . 
+\fs18\fsmilli9333 n
+\f3 \uc0\u8594 
+\f0 \uc0\u8734  
+\fs24 \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 5 Multiple Queries 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 In the previous sections, we analyzed the behavior of Pr(F(z)) for some fixed z and moderately sized n. Unfortunately, this quantity is not directly of interest in most applications. Instead, one is usually concerned with certain character- istics of the distribution of the number of elements in a sequence (of distinct elements) z
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 , . . . , z
+\fs18\fsmilli9333 \dn3 l 
+\f3\fs26\fsmilli13333 \up0 \uc0\u8712 
+\f0  U \uc0\u8722  S for which F(z) occurs. In other words, rather than being interested in the probability that a particular false positive occurs, we are concerned with, for example, the fraction of distinct queries on elements of U \u8722  S posed to the filter for which it returns false positives. Since \{F(z) : z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722  S\} are not independent, the behavior of Pr(F) alone does not directly imply results of this form. This section is devoted to overcoming this difficulty. 
+\fs24 \
+
+\fs26\fsmilli13333 We start with a definition. 
+\fs24 \
+
+\fs26\fsmilli13333 Definition 1. Consider any scheme where \{H(u) : u
+\f3 \uc0\u8712 
+\f0 U\} are independent and identically distributed. Write S = \{x
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 , . . . , x
+\fs18\fsmilli9333 \dn3 n
+\fs26\fsmilli13333 \up0 \}. The false positive rate is defined to be the random variable R = Pr(F | H(x
+\fs18\fsmilli9333 \dn3 1
+\fs26\fsmilli13333 \up0 ), . . . , H(x
+\fs18\fsmilli9333 \dn3 n
+\fs26\fsmilli13333 \up0 )). 
+\fs24 \
+
+\fs26\fsmilli13333 The false positive rate gets its name from the fact that, conditioned on R, the events \{F(z) : z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722  S\} are independent with common probability R. Thus, the fraction of a large number of queries on elements of U \u8722  S posed to the filter for which it returns false positives is very likely to be close to R. In this sense, R, while a random variable, acts like a rate for \{F(z) : z 
+\f3 \uc0\u8712 
+\f0  U \uc0\u8722  S\}. 
+\fs24 \
+
+\fs26\fsmilli13333 It is important to note that in much of literature concerning standard Bloom filters, the false positive rate is not defined as above. Instead the term is often used as a synonym for the false positive probability. Indeed, for a standard Bloom filter, the distinction between the two concepts as we have defined them is unimportant in practice, since one can easily show that R is very close to Pr(F) with extremely high probability (see, for example, [13]). It turns out that this result generalizes very naturally to the framework presented in this paper, and so the practical difference between the two concepts is largely unimportant even in our very general setting. However, the proof is more complicated than in the case of a standard Bloom filter, and so we must be careful to use the terms as we have defined them. 
+\fs24 \
+
+\fs26\fsmilli13333 We give only an outline of our results here, deferring the details to [10]. First, we use a standard Doob martingale argument to apply the Azuma-Hoeffding 
+\fs24 \
+Less Hashing, Same Performance: Building a Better Bloom Filter 465 \
+
+\fs26\fsmilli13333 inequality to R, which tells us that R is concentrated around \dn3 E\up0 [R] = Pr(F). We then use that result to prove versions of the strong law of large numbers, the weak law of large numbers, Hoeffding\'92s inequality, and the central limit theorem. 
+\fs24 \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 6 Experiments 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 In this section, we evaluate the theoretical results of the previous sections empiri- cally for small values of n. We are interested in the following specific schemes: the standard Bloom filter scheme, the partition scheme, the double hashing scheme, and the extended double hashing schemes where f(i) = i
+\fs18\fsmilli9333 \up10 2 
+\fs26\fsmilli13333 \up0 and f(i) = i
+\fs18\fsmilli9333 \up10 3
+\fs26\fsmilli13333 \up0 . 
+\fs24 \
+
+\fs26\fsmilli13333 For c 
+\f3 \uc0\u8712 
+\f0  \{4,8,12,16\}, we do the following. First, compute the value of k 
+\f3 \uc0\u8712 
+\f0  \{
+\f4 \uc0\u8970 
+\f0 c ln 2
+\f4 \uc0\u8971 
+\f0 , 
+\f4 \uc0\u8968 
+\f0 c ln 2
+\f4 \uc0\u8969 
+\f0 \} that minimizes p = (1 \uc0\u8722  exp[\u8722 k/c])
+\fs18\fsmilli9333 \up10 k 
+\fs26\fsmilli13333 \up0 . Next, for each of the schemes under consideration, repeat the following procedure 10,000 times: in- stantiate the filter with the specified values of n, c, and k, populate the filter with a set S of n items, and then query 
+\f4 \uc0\u8968 
+\f0 10/p
+\f4 \uc0\u8969 
+\f0  elements not in S, recording the number Q of those queries for which the filter returns a false positive. We then approximate the false positive probability of the scheme by averaging the results over all 10, 000 trials. We use the standard Java pseudorandom number generator to simulate independent hash values. 
+\fs24 \
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f5\fs16 \cf2 0.148 0.1478 0.1476 0.1474 0.1472 
+\f0\fs24 \
+
+\f5\fs16 0.147 0.1468 0.1466 0.1464 0.1462 
+\f0\fs24 \
+
+\f5\fs16 0.02185 0.0218 0.02175 0.0217 0.02165 0.0216 0.02155 0.0215 0.02145 
+\f0\fs24 \
+
+\f5\fs16 0.00056 0.00055 0.00054 0.00053 0.00052 0.00051 
+\f0\fs24 \
+
+\f5\fs16 0.0005 0.00049 0.00048 0.00047 0.00046 0.00045 
+\f0\fs24 \
+
+\f5\fs16 c = 4, k = 3 
+\f0\fs24 \
+
+\f5\fs16 c = 8, k = 6 
+\f0\fs24 \
+
+\f5\fs16 5 101520253035404550 n/1000 
+\f0\fs24 \
+
+\f5\fs16 c = 16, k = 11 
+\f0\fs24 \
+
+\f5\fs16 5 101520253035404550 n/1000 
+\f0\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page10image22784.png \width2160 \height1360
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page10image24384.png \width2160 \height1360
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26312.png \width65 \height65
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29784.png \width12 \height48
+}¬} {{\NeXTGraphic page10image30208.png \width2080 \height1400
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image54304.png \width65 \height65
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image57608.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59472.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image60216.png \width48 \height12
+}¬} {{\NeXTGraphic page10image60640.png \width4 \height4
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image57608.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image62504.png \width8 \height33
+}¬} {{\NeXTGraphic page10image59472.png \width61 \height61
+}¬} {{\NeXTGraphic page10image63088.png \width2100 \height820
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image60640.png \width4 \height4
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67920.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image69408.png \width61 \height61
+}¬} {{\NeXTGraphic page10image70168.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image59472.png \width61 \height61
+}¬} {{\NeXTGraphic page10image72400.png \width8 \height33
+}¬} {{\NeXTGraphic page10image72400.png \width8 \height33
+}¬} {{\NeXTGraphic page10image59472.png \width61 \height61
+}¬} {{\NeXTGraphic page10image57608.png \width61 \height61
+}¬} {{\NeXTGraphic page10image73568.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image69408.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59472.png \width61 \height61
+}¬} {{\NeXTGraphic page10image76096.png \width33 \height8
+}¬} {{\NeXTGraphic page10image76256.png \width994 \height9
+}¬} {{\NeXTGraphic page10image70168.png \width61 \height61
+}¬} {{\NeXTGraphic page10image76840.png \width61 \height61
+}¬} {{\NeXTGraphic page10image77600.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image77600.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image73568.png \width61 \height61
+}¬} {{\NeXTGraphic page10image80856.png \width61 \height61
+}¬} {{\NeXTGraphic page10image60640.png \width4 \height4
+}¬} {{\NeXTGraphic page10image81176.png \width33 \height8
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image60216.png \width48 \height12
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image83680.png \width61 \height61
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image87152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬}\
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f5\fs16 \cf2 0.146\uc0\u8232 5 101520253035404550 
+\f0\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬}\
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f5\fs16 \cf2 0.00326 0.00324 0.00322 
+\f0\fs24 \
+
+\f5\fs16 0.0032 0.00318 0.00316 0.00314 0.00312 
+\f0\fs24 \
+
+\f5\fs16 n/1000\uc0\u8232 c = 12, k = 8 
+\f0\fs24 \
+
+\f5\fs16 5 101520253035404550 n/1000 
+\f0\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page10image94488.png \width2080 \height1380
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page10image117592.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image118072.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image119512.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image121216.png \width2040 \height1360
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26312.png \width65 \height65
+}¬} {{\NeXTGraphic page10image122128.png \width2040 \height1360
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image119512.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image119512.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image57608.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image83680.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image57608.png \width61 \height61
+}¬} {{\NeXTGraphic page10image80856.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image149704.png \width1836 \height72
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image151112.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image152440.png \width33 \height8
+}¬} {{\NeXTGraphic page10image152600.png \width61 \height61
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image80856.png \width61 \height61
+}¬} {{\NeXTGraphic page10image67496.png \width61 \height61
+}¬} {{\NeXTGraphic page10image59312.png \width56 \height56
+}¬} {{\NeXTGraphic page10image152440.png \width33 \height8
+}¬} {{\NeXTGraphic page10image154568.png \width33 \height8
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image26152.png \width12 \height48
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image29464.png \width48 \height12
+}¬} {{\NeXTGraphic page10image161448.png \width5184 \height268
+}¬}\
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f5\fs16 \cf2 p Partition Ext. Double (Square) Standard Double Ext. Double (Cube) 
+\f0\fs24 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page10image162952.png \width325 \height68
+}¬}\pard\pardeftab720\sl280\partightenfactor0
+\cf2  {{\NeXTGraphic page10image163544.png \width325 \height68
+}¬} {{\NeXTGraphic page10image164136.png \width325 \height68
+}¬} {{\NeXTGraphic page10image164728.png \width325 \height68
+}¬} {{\NeXTGraphic page10image165656.png \width360 \height56
+}¬}\
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 Fig. 1. Estimates of the false positive probability for various schemes and parameters \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The results are shown in Figure 1. In Figure 1, we see that for small values of c, the different schemes are essentially indistinguishable from each other, and simultaneously have a false positive probability/rate close to p. This result is 
+\fs24 \
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f5\fs16 \cf2 Estimated False Positive Probability 
+\f0\fs24 \
+
+\f5\fs16 Estimated False Positive Probability 
+\f0\fs24 \
+
+\f5\fs16 Estimated False Positive Probability 
+\f0\fs24 \
+
+\f5\fs16 Estimated False Positive Probability 
+\f0\fs24 \
+466 A. Kirsch and M. Mitzenmacher \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 particularly significant since the filters that we are experimenting with are fairly small, supporting our claim that these schemes are useful even in settings with very limited space. However, we also see that for the slightly larger values of c 
+\f3 \uc0\u8712 
+\f0  \{12, 16\}, the partition scheme is no longer particularly useful for small values of n, while the other schemes are. This result is not particularly surprising, since we know from [10, Section 6] that all of these schemes are unsuitable for small values of n and large values of c. Furthermore, we expect that the partition scheme is the least suited to these conditions, given the standard fact that the partitioned version of a standard Bloom filter never performs better than the original version. Nevertheless, the partition scheme might still be useful in certain settings, since it gives a substantial reduction in the range of the hash functions. 
+\fs24 \
+\pard\pardeftab720\sl360\sa240\partightenfactor0
+
+\fs32 \cf2 7 Conclusion 
+\fs24 \
+\pard\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 Bloom filters are simple randomized data structures that are extremely useful in practice. In fact, they are so useful that any significant reduction in the time required to perform a Bloom filter operation immediately translates to a substantial speedup for many practical applications. Unfortunately, Bloom filters are so simple that they do not leave much room for optimization. 
+\fs24 \
+
+\fs26\fsmilli13333 This paper focuses on modifying Bloom filters to use less of the only re- source that they traditionally use liberally: (pseudo)randomness. Since the only nontrivial computations performed by a Bloom filter are the constructions and evaluations of pseudorandom hash functions, any reduction in the required num- ber of pseudorandom hash functions yields a nearly equivalent reduction in the time required to perform a Bloom filter operation (assuming, of course, that the Bloom filter is stored entirely in memory, so that random accesses can be performed very quickly). 
+\fs24 \
+
+\fs26\fsmilli13333 We have shown that a Bloom filter can be implemented with only two pseu- dorandom hash functions without any increase in the asymptotic false positive probability. We have also shown that the asymptotic false positive probability acts, for all practical purposes and reasonable settings of a Bloom filter\'92s param- eters, like a false positive rate. This result has enormous practical significance, since the analogous result for standard Bloom filters is essentially the theoretical justification for their extensive use. 
+\fs24 \
+
+\fs26\fsmilli13333 More generally, we have given a framework for analyzing modified Bloom filters, which we expect will be used in the future to refine the specific schemes that we analyzed in this paper. We also expect that the techniques used in this paper will be usefully applied to other data structures, as demonstrated by our modification to the Count-Min sketch (in [10]). 
+\fs24 \
+}

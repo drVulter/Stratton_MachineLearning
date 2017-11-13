@@ -1,0 +1,879 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\froman\fcharset0 Times-Roman;\f1\fnil\fcharset0 GillSans;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trcbpat3 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+
+\f0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trcbpat3 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 Abstract 
+\f0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The FrameNet database contains descriptions of more than 7,000 lexical units based on more than 130,000 annotated sentences. The database and its related software are central to the process of entering lexical information, annotating sentences, displaying the results, and distributing the FrameNet data. This article discusses both how the design of the database follows the principles of frame semantics and also how the database provides appropriate access for project staff and users elsewhere. 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 1. Introduction: Conceptual Relations and Relations in Databases 
+\f0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 The basic product of the FrameNet (FN) project is its data; in this chapter we will examine the form in which this data is stored and manipulated internally and discuss why this form was chosen. The project has received two NSF grants, each for a period of three years;
+\fs16 \up8 1 
+\fs29\fsmilli14667 \up0 we refer to these phases of the project as FrameNet I and FrameNet II. The change from FrameNet I to II coincided with a major change in the representation of the data; this section will discuss what was changed at that time and why. 
+\fs24 \
+
+\fs29\fsmilli14667 The data model used in FrameNet I (Lowe et al. 1997, Baker et al. 1998) represented all the annotation on the sentence as text with SGML mark-up
+\fs16 \up8 2
+\fs29\fsmilli14667 \up0 , with the frame element (FE), phrase type (PT) and grammatical function (GF) of each labeled constituent marked as attributes on a general \'93constituent\'94 element <C>, as in this marked-up version of the sentence 
+\i I am conscious that it is a difficult and complex subject 
+\i0 : 
+\fs16 \up8 3 
+\fs24 \up0 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 <S TPOS = \'9381597120\'94>... <C FE = \'93Cog\'94 PT = \'93NP\'94 GF = \'93Ext\'94>I </C> <C TYPE = \'93SuppV\'94 PT = \'93XFE\'94 GF = \'93XFE\'94>am </C> <C TARGET = \'93y\'94> conscious </C> <C FE = \'93Cont\'94 PT = \'93Sfin\'94 GF = \'93Comp\'94>that it is a complex and difficult subject</C> . </S> 
+\f0\fs24 \cell \lastrow\row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trcbpat3 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page1image23216.png \width14 \height691
+}¬} {{\NeXTGraphic page1image23216.png \width14 \height691
+}¬} {{\NeXTGraphic page1image23536.png \width9 \height486
+}¬} {{\NeXTGraphic page1image23536.png \width9 \height486
+}¬} {{\NeXTGraphic page1image23856.png \width249 \height249
+}¬} {{\NeXTGraphic page1image23856.png \width249 \height249
+}¬} {{\NeXTGraphic page1image24176.png \width246 \height246
+}¬} {{\NeXTGraphic page1image24176.png \width246 \height246
+}¬} {{\NeXTGraphic page1image24496.png \width349 \height13
+}¬} {{\NeXTGraphic page1image24496.png \width349 \height13
+}¬} {{\NeXTGraphic page1image24816.png \width246 \height9
+}¬} {{\NeXTGraphic page1image24816.png \width246 \height9
+}¬} {{\NeXTGraphic page1image25136.png \width6627 \height473
+}¬}\cell \lastrow\row
+\pard\pardeftab720\sl280\sa240\partightenfactor0
+\cf2 International Journal of Lexicography, Vol. 16 No. 3 \'a9 2003 Oxford University Press. All rights reserved. \
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trcbpat3 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page1image27424.png \width349 \height13
+}¬} {{\NeXTGraphic page1image27424.png \width349 \height13
+}¬} {{\NeXTGraphic page1image27744.png \width246 \height9
+}¬} {{\NeXTGraphic page1image27744.png \width246 \height9
+}¬} {{\NeXTGraphic page1image28064.png \width13 \height349
+}¬} {{\NeXTGraphic page1image28224.png \width13 \height349
+}¬} {{\NeXTGraphic page1image28064.png \width13 \height349
+}¬} {{\NeXTGraphic page1image28544.png \width9 \height246
+}¬} {{\NeXTGraphic page1image28704.png \width9 \height246
+}¬} {{\NeXTGraphic page1image28544.png \width9 \height246
+}¬} {{\NeXTGraphic page1image23856.png \width249 \height249
+}¬} {{\NeXTGraphic page1image24176.png \width246 \height246
+}¬} {{\NeXTGraphic page1image29344.png \width691 \height14
+}¬} {{\NeXTGraphic page1image29504.png \width486 \height9
+}¬} \cell \lastrow\row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 282 Collin F. Baker, Charles J. Fillmore, Beau Cronin 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 In choosing a data model for the second phase of FrameNet, we were eager to move away from such a representation, for several reasons: 
+\fs24 \
+
+\fs29\fsmilli14667 (a) Storing the data as text with mark-up meant that searching across the data was slow. In order to speed up access, we resolved to use a real database, where the off-the-shelf software would provide fast access, automatic indexing, and query optimization. 
+\fs24 \
+
+\fs29\fsmilli14667 (b) We wanted to deal with situations in which the same constituent might represent more than one FE, as in 
+\i The internist treated the diabetic
+\i0 , where the Cure frame is evoked by the word 
+\i treated
+\i0 , and 
+\i the diabetic 
+\i0 is the filler of both the 
+\fs21\fsmilli10667 PATIENT 
+\fs29\fsmilli14667 FE and the 
+\fs21\fsmilli10667 DISEASE 
+\fs29\fsmilli14667 FE. In this case, we would need to have an element within an element, which causes problems for much of the software for SGML/XML. Therefore, we wanted a representation in which the FE, PT and GF labels would be on separate \'91layers\'92, distinct from each other and from the text itself. (This is sometimes referred to as \'91standoff mark-up\'92.) 
+\fs24 \
+
+\fs29\fsmilli14667 (c) Making across-the-board changes (such as renaming a frame element) in hundreds of separate SGML files was tedious and error-prone. We needed a representation in which the labels of the same type would refer to a single definition of the FE, PT or GF. 
+\fs24 \
+
+\fs29\fsmilli14667 This last point suggests the answer which we adopted: a relational database. The chief advantage of a relational database is that data which occurs repeatedly is entered into the database only once. Each use of that value consists of a pointer to that one entry. Of course, this means that the representation is more indirect, and contents of the database are not directly interpretable. Suppose, for example, that we have the sentence 
+\i Carlos walked to the fountain
+\i0 , where the verb 
+\i walked 
+\i0 evokes the Self_motion frame, and we want to mark the phrase 
+\i to the fountain 
+\i0 as the 
+\fs21\fsmilli10667 GOAL 
+\fs29\fsmilli14667 frame element. In the SGML used in FrameNet I, we would have the following (leaving aside the other marking that would occur in the sentence): 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 <S IDNUM = \'931235\'94>Carlos walked <C FE = \'93Goal\'94>to the fountain </C></S>. 
+\f0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 In FrameNet II, the label for the 
+\fs21\fsmilli10667 GOAL 
+\fs29\fsmilli14667 is represented as several entries in the database. One entry shows that there is a label extending from character 14 to character 28 of the text, another that this label has a certain set of colors, and that it represents the 
+\fs21\fsmilli10667 GOAL 
+\fs29\fsmilli14667 in the Self-motion frame (as we will discuss below in section 3.2). This representation is more complex than directly inserting SGML labels, but the advantage of having information such as FE names represented only once in the database far outweighs the inconvenience due to the increased complexity. If, for example, we wanted to translate the name of the FE into German, we would only need to edit the entry in the FrameElement table, substituting 
+\fs21\fsmilli10667 ZIEL 
+\fs29\fsmilli14667 for 
+\fs21\fsmilli10667 GOAL
+\fs29\fsmilli14667 , and all appearances of the FE name, on screen or in reports, would be changed. 
+\fs24 \
+
+\fs29\fsmilli14667 The relational database which holds the FrameNet II data has been designed so that its structure, so far as practical, models the conceptual structure on which 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The Structure of the FrameNet Database 283 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 the project is based. But the things we want to represent are rather disparate. On the one hand, we have hundreds of frames and thousands of frame elements (each specific to a given frame), defined \'91by hand\'92, as described in the article \'91FrameNet in Action\'92 in this volume. On the other hand we have more than 130,000 sentences with their associated annotations. Since there are typically two or more sets of FE, GF and PT labels on each annotated sentence, the tables containing the annotation are hundreds of times larger than those containing the frames and FEs. It is therefore convenient to consider separately the part of the database that represents the frames, FEs, lexical units, etc. from the part that contains the sentences and their annotation. We will refer to these as the \'91lexical database\'92 and the \'91annotation database\'92 respectively, and will discuss them separately below, although they are implemented in a single MySQL database. Note that the structure of the relational database has also changed in several relatively minor ways over the course of FrameNet II; these changes will not be discussed here.
+\fs16 \up8 4 
+\fs29\fsmilli14667 \up0 Likewise, we refer to staff engaged in defining frames and lexical units and setting the parameters for extraction of example sentences as the \'91vanguard\'92, and those engaged in marking frame elements on sentences as \'91annotators\'92, even though most staff members do both sorts of work. 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 2. The Lexical Database 
+\f0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page3image20728.png \width6664 \height3698
+}¬}\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 2.1. 
+\i Frames and Frame Elements 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Figure 1 
+\fs24 \
+
+\fs29\fsmilli14667 The basic units of Frame Semantics (Fillmore 1976, 1977b, 1982, 1985) are frames and the frame elements (FEs) that comprise them. In Fig. 1 above, this situation is represented by the tables Frame (A) and FrameElement (B), and the one-to-many relation between them (C), which indicates that each frame 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 284 Collin F. Baker, Charles J. Fillmore, Beau Cronin 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 element (FE) is defined with regard to exactly one frame, and that frames are typically associated with more than one frame element. Because FEs are defined relative to frames, FEs in different frames may have identical names, without implying any relation between them. In practice, of course, we strive to give frame elements meaningful names, so it is not entirely accidental that more than 70 frames have FEs with the name 
+\fs21\fsmilli10667 AGENT
+\fs29\fsmilli14667 . Nevertheless, one cannot conclude anything from this fact alone; if they are all related by a more general concept of agent, this will have to be stated explicitly, by entering FE-to-FE relations in the database, as will be discussed below. 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 2.2. 
+\i Lemmas, Lexemes,Word Forms, and Parts of Speech 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 As different researchers use different terminology in this area, it is essential to define our terms at the start of the discussion. By 
+\i word form
+\i0 , we mean one of the forms of a word differing by inflection; by 
+\i lexeme
+\i0 , we mean any of the inflectional versions of a word, represented by the uninflected stem: the singular of a noun, the unmarked infinitive of a verb, the plain form of an adjective, or the single form of an uninflected word. Typically, one English noun lexeme is associated with two word forms (singular and plural) and one English verb lexeme with four (
+\i need, needs, needed, needing
+\i0 ), although irregularities increase these numbers slightly. To handle multiword expressions, we posit a higher level or organization, the 
+\i lemma
+\i0 , composed of one or more 
+\i lexemes
+\i0 . In the left part of Fig. 1, we see the tables relating lemmas, parts of speech, lexemes, and word forms. As the connectors indicate
+\fs16 \up8 5
+\fs29\fsmilli14667 \up0 , each lemma has one part of speech, as does each lexeme. Each lexeme is associated with one or more word forms, but each word form is associated with only one lexeme. (This entails some redundancy in the word form table, but is simpler than carefully maintaining the links that would be required for more parsimonious storage.) 
+\fs24 \
+
+\fs29\fsmilli14667 The LexemeEntry table is needed to represent 
+\i multiword expressions 
+\i0 (MWEs), such as verb+particle (
+\i take off
+\i0 ), N-N compounds (
+\i family practitioner
+\i0 ), and longer constructions (
+\i Martin Luther King Day, have bats in one\'92s belfry, an X\'92s paradise
+\i0 ). For the sake of consistency, 
+\b all 
+\b0 lemmas, even those with only one lexeme, are connected to their lexemes via the LexemeEntry table. In the case of MWEs, the fields in this table indicate not only the order of the lexemes, but also which lexeme is the lexical head, and whether or not the MWE is separable. For example, the lemma 
+\i go broke 
+\i0 is comprised of the two lexemes 
+\i go 
+\i0 and 
+\i broke
+\i0 ; the first is the head and undergoes the usual inflection for the lexeme go while the latter is invariant (
+\i *went broken
+\i0 ). Therefore, the first lexeme will be associated with the appropriate five word forms (
+\i go
+\i0 , 
+\i goes
+\i0 , 
+\i went
+\i0 , 
+\i gone
+\i0 , 
+\i going
+\i0 ), while the second lexeme has only one word form, not related (as least in our database) to the lexeme 
+\i break 
+\i0 (v). To give another example, there would be two lexical units (in quite different frames) containing the lexemes 
+\i take off
+\i0 , one separable (
+\i take your sweater off
+\i0 ) and one inseparable (
+\i the plane took off
+\i0 ). In both of these, the lexeme 
+\i take 
+\i0 would be marked as the head of the 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The Structure of the FrameNet Database 285 
+\fs24 \cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 lemma. In the \'93wear\'94 sense, the LexemeEntry table for 
+\i off 
+\i0 would also have the field called Break_before set to \'91true\'92, to indicate that light NPs usually break the lemma by being inserted before it (
+\i took them off
+\i0 ).
+\fs16 \up8 6 
+\fs24 \up0 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 2.3. 
+\i Frames, Lemmas and Lexical Units 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 FrameNet measures its progress in terms of Lexical Units (LUs)
+\fs16 \up8 7
+\fs29\fsmilli14667 \up0 , which are defined as an association between a lemma and a frame. Since lemmas are units of form and frames represent meaning, lexical units correspond roughly to dictionary senses. Each LU thus has a link to a single frame and a single lemma. Many lemmas are associated with more than one frame, and thus constitute more than one LU; this is how FrameNet represents polysemy. The meaning of the LU is also expressed in words in the Sense Description field of the LexUnit table. 
+\fs24 \
+
+\fs29\fsmilli14667 Each LU also has its own Name field, in addition to the name of the lemma, because the same lemma can appear twice in the same frame in different senses. A clear example is the noun 
+\i possession 
+\i0 which occurs in two different LUs in the Possession frame, one referring to the things possessed and the other to the state of possessing something (
+\i Her most precious possession was a diamond ring 
+\i0 vs. 
+\i Possession is nine tenths of the law
+\i0 ). The names of these two LUs are 
+\i possession 
+\i0 and 
+\i possession of goods 
+\i0 respectively. 
+\fs24 \
+
+\fs29\fsmilli14667 One or more statuses can be associated with each LU. Some of these are temporary, used for keeping track of the state of work on each lexical unit, e.g. whether subcorpora have been prepared for it, whether it is in the process of annotation, whether there is an unresolved problem regarding the frame and whether the LU belongs in it, etc. Others will be of interest to the end users of the FrameNet data, as they indicate the final disposition of the lexical unit, as shown in Table 1: 
+\fs24 \
+
+\fs29\fsmilli14667 Table 1: Lexical Unit Statuses 
+\fs24 \cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth5398\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth9762\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\b\fs29\fsmilli14667 \cf2 Status 
+\b0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\b\fs29\fsmilli14667 \cf2 Definition 
+\b0\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth5398\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth9762\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Finished 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Enough examples were found and annotated during FrameNet II. 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth5398\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth9762\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 FN1 Sent 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Annotated during FrameNet I. 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth5398\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth9762\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Insufficient attestations 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 The LU has been defined in a frame, but we have not found enough good examples to annotate. 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth5398\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw60\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth9762\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw60\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 By analogy 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 This LU is one of a group of LUs that behave identically (such as the days of the week), and so only one or two of the group will be annotated; the others simply marked as similar. 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 286 Collin F. Baker, Charles J. Fillmore, Beau Cronin 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 2.4. 
+\i Frame-to-Frame and FE-to-FE Relations 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 If the semantics of FrameNet were limited to a list of frames and their definitions, it would be impossible to express many generalizations. For example, most frames involving motion allow FEs representing the path followed by the moving object, from a 
+\fs21\fsmilli10667 SOURCE
+\fs29\fsmilli14667 , along a 
+\fs21\fsmilli10667 PATH 
+\fs29\fsmilli14667 proper, to a 
+\fs21\fsmilli10667 GOAL
+\fs29\fsmilli14667 ; we need a formal way to express this generalization. In FrameNet I, one type of relation among frames was expressed: frames were grouped into semantic domains, such as Communication, Motion, Society, etc. But the theoretical basis of such groupings was never made explicit; as time went on, we realized that we needed to represent notions such as one frame being a subtype of another, or one event frame being composed of a series of smaller 
+\i scenes 
+\i0 (Fillmore 1977a). When two frames are related, their frame elements are also often related to each other in more or less predictable ways. In the FrameNet II database, instead of the domains of FrameNet I, we have defined a variety of relations between frames and between FEs, and we have made it possible to define new relations relatively easily, by adding the tables FrameRelationType and FERelationType to the database. Each Frame-to-frame relation is associated with exactly one FrameRelationType, which may be directed or undirected, and FE-to-FE relations are handled similarly. We will discuss below some of the more important of these relations. 
+\fs24 \
+
+\fs29\fsmilli14667 2.4.1 
+\i Frame Inheritance
+\i0 . The relation mentioned above among frames involving motion is a good example of 
+\i frame inheritance
+\i0 , which we define as 
+\i full 
+\i0 and 
+\i monotonic
+\i0\b , 
+\b0 with the possibility of 
+\i multiple inheritance
+\i0 : 
+\fs24 \
+
+\fs29\fsmilli14667 (a) 
+\i Full 
+\i0 inheritance means that if frame B inherits from frame A, there must be an FE in B corresponding to each FE in A ; the FE in B can have a different name from that in A, but there must be a binding between them. Child frames can have additional FEs not found in their parent(s). 
+\fs24 \
+
+\fs29\fsmilli14667 (b) 
+\i Monotonic 
+\i0 means that if a parent frame or FE has a semantic type, the semantic type of the child frame or FE must be the same as or a subtype (elaboration) of the semantic type of the parent. (cf. Semantic types, below) 
+\fs24 \
+
+\fs29\fsmilli14667 (c) 
+\i Multiple 
+\i0 inheritance means that a child frame (and therefore its FEs) can have any number of parents (though we rarely posit more than two in practice). 2.4.2 
+\i The Subframe Relation
+\i0 . Many frames express concepts which have natural, well-defined subparts. For example, many complex events break down into a series of smaller events, occurring in a particular order. Since all semantics is expressed in terms of frames
+\fs16 \up8 8
+\fs29\fsmilli14667 \up0 , each subevent will also be a frame, and we call them subframes of the complex event. Thus, the complex frame Picnic willhavesubframesofpreparingfood,goingtoasuitablespot,eating a meal there, and returning home. Subframes typically contain FEs that are bound to FEs of their complex frame, and thus indirectly to each other. For example, in the subframes of Picnic, the subframes of going to the spot and returning home will contain an FE 
+\fs21\fsmilli10667 MOVER
+\fs29\fsmilli14667 , and the eating subframe will contain an FE 
+\fs21\fsmilli10667 EATER
+\fs29\fsmilli14667 , all of which will be bound to the FE 
+\fs21\fsmilli10667 PICNICKER 
+\fs29\fsmilli14667 of the complex frame, and thus, transitively, to each other, since one who participates in a picnic 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The Structure of the FrameNet Database 287 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 must participate in each of those stages. The FE for the 
+\fs21\fsmilli10667 PREPARER 
+\fs29\fsmilli14667 of the food in the first subframe, on the other hand, will not be bound to the 
+\fs21\fsmilli10667 PICNICKER
+\fs29\fsmilli14667 , since the action of preparing food is not necessarily performed by the one who goes on the picnic. 
+\fs24 \
+
+\fs29\fsmilli14667 If a complex frame A is inherited by another frame B, our notion of full inheritance requires that all the subframes of A be bound to subframes of B, that is, subframe structure is also inherited. If B also inherits from another complex frame, the details of the bindings can be complex. 
+\fs24 \
+
+\fs29\fsmilli14667 2.4.3 
+\i The Uses Relation
+\i0 . This is a relation like inheritance, but less strictly defined. If frame B 
+\i uses 
+\i0 frame A, frame B need not have an FE corresponding to each FE of frame A. We have defined this relation mainly because working out full inheritance lattices among frames has proven to be extremely contentious and time-consuming. The Uses relation allows us to define a similar relation without getting bogged down in details. For example, the Conversation frame is clearly related to the more abstract Communication frame, but the Communication frame contains an FE 
+\fs21\fsmilli10667 MESSAGE
+\fs29\fsmilli14667 , which is not an element in the Conversation frame. We cannot say that Conversation 
+\i inherits 
+\i0 Communication, or we would violate the principle of full inheritance, but we can say that Conversation 
+\i uses 
+\i0 Communication and avoid this dilemma. 
+\fs24 \
+
+\fs29\fsmilli14667 2.4.4 
+\i The \'91See also\'92 relation. 
+\i0 Although distinguishing among closely related frames is often difficult, defining the differences among frames is crucial to the FrameNet enterprise. We need a way of explaining the distinctions among a group of frames in one place, without repeating this explanation for each frame in the group. We do this much as dictionaries distinguish among closely related headwords, by writing a discussion of the distinctions in a group (a synonymy), making it part of the entry for a single headword, and then referring to that entry from the definitions of the other members of the group. The \'91see also\'92 relation is a pointer from one or more frames to another frame whose definition includes a detailed discussion of the differences among the frames in the group. For example, we treat the two uses of words like 
+\i load 
+\i0 in 
+\i She loaded the wagon with hay 
+\i0 and 
+\i She loaded the hay onto the wagon 
+\i0 in the two frames Filling and Placing respectively. The detailed discussion of the distinction between these two frames is located in the definition of Filling and there is a \'91see also\'92 relation from Filling to Placing. 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 288 Collin F. Baker, Charles J. Fillmore, Beau Cronin 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\fs29\fsmilli14667 \cf2 3. The Annotation Database 
+\f0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 {{\NeXTGraphic page8image9408.png \width6631 \height2829
+}¬}\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 Figure 2 
+\fs24 \
+
+\fs29\fsmilli14667 The day-to-day work of FrameNet consists mainly of annotating sentences chosen from a corpus as examples of a particular lexical unit. Once again, the structure of the tables used to store the sentences and annotation on them (shown in Fig. 2) reflects the structure of the concepts involved. 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 3.1. 
+\i Subcorpora and Sentences 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 The software used to extract the example sentences for an LU allows the vanguard to exclude certain collocates (as likely to indicate the wrong sense of the lemma\'97\'93out of frame\'94 uses), to include certain collocates, and to select for certain syntactic patterns that are believed (on the basis of some preliminary corpus searches and introspection) to be important for this LU. When presented to the annotators by the annotation software, the sentences are grouped according to these patterns into 
+\i subcorpora 
+\i0 and the lemma under study (the 
+\i target
+\i0 ) is already marked. 
+\fs24 \
+
+\fs29\fsmilli14667 The idea is that (1) annotation will be easier if sentences are presented in some sort of reasonable order and (2) we want to be sure to annotate a few examples of each different pattern in which the lemma occurs; having patterns grouped together helps annotators keep track of how many of each pattern have been done. Of course, the vanguard cannot always foresee all the relevant patterns, so there are fairly large subcorpora for \'91other\'92 sentences which contain the target but don\'92t fit any of the patterns requested by the vanguard. 
+\fs24 \
+
+\fs29\fsmilli14667 The simplest database representation for subcorpora would be to create a link directly from the sentences to the subcorpus. But the situation is actually a little more complicated. For each target, there is a set of 
+\i annotation layers 
+\i0 for the FEs, phrase types, grammatical functions, etc.; each such set is represented by an entry in the AnnotationSet table, linking a sentence, a subcorpus, and (via the subcorpus) an LU. This makes it possible for one sentence to be annotated more 
+\fs24 \cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 The Structure of the FrameNet Database 289 
+\fs24 \cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 than once, with regard to more than one target word; the two targets will be linked to different annotation sets (and typically to different LUs). 
+\fs24 \
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\f1\fs26\fsmilli13333 \cf2 3.2 
+\i Annotation Sets, Layers, and Labels 
+\f0\i0\fs24 \
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 The annotation process is conceived of as labeling portions of the example sentences with labels indicating various relevant syntactic and semantic properties. A constituent of a sentence may represent a particular frame element; for example, in the sentence 
+\i Helmut saw a tall, black figure against the shining snow
+\i0 , with 
+\i see 
+\i0 as the target in the Perception_passive frame, 
+\i Helmut 
+\i0 expresses the FE 
+\fs21\fsmilli10667 PERCEIVER
+\fs29\fsmilli14667 -
+\fs21\fsmilli10667 PASSIVE
+\fs29\fsmilli14667 , 
+\i a tall, black figure
+\i0 , the FE 
+\fs21\fsmilli10667 PHENOMENON
+\fs29\fsmilli14667 , and 
+\i against the shining snow
+\i0 , the FE 
+\fs21\fsmilli10667 GROUND
+\fs29\fsmilli14667 . We further specify the phrase types of each of these constituents as NP, NP and PP respectively. We also describe their grammatical function relative to the target as subject (which we refer to as the 
+\i external argument
+\i0\fs16 \up8 9 
+\fs29\fsmilli14667 \up0 of 
+\i see
+\i0 ), object, and complement respectively. We think of these three sets of labels as being on three more or less independent 
+\i layers
+\i0 , called FE, PT and GF, as shown below: 
+\fs24 \
+
+\fs29\fsmilli14667 Table 2: Layered Annotation 
+\fs24 \cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth1979\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth4279\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth1350\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth3790\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3581\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\b\fs26\fsmilli13333 \cf2 (T
+\fs21\fsmilli10667 EXT
+\fs26\fsmilli13333 ) 
+\b0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\i\fs26\fsmilli13333 \cf2 Helmut 
+\i0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\i\fs26\fsmilli13333 \cf2 saw 
+\i0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\i\fs26\fsmilli13333 \cf2 a tall, black figure 
+\i0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\i\fs26\fsmilli13333 \cf2 against the snow 
+\i0\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth1979\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth4279\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth1350\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth3790\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3581\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\b\fs26\fsmilli13333 \cf2 FE 
+\b0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 P
+\fs21\fsmilli10667 ERCEIVER
+\fs26\fsmilli13333 -
+\fs21\fsmilli10667 PASSIVE 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell 
+\pard\intbl\itap1\pardeftab720\sl260\sa240\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 PHENOMENON 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 G
+\fs21\fsmilli10667 ROUND 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth1979\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth4279\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth1350\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth3790\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3581\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\b\fs26\fsmilli13333 \cf2 PT 
+\b0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 NP 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 NP 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 PP 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth1979\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clvertalc \clshdrawnil \clwWidth4279\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clvertalc \clshdrawnil \clwWidth1350\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clvertalc \clshdrawnil \clwWidth3790\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw20\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clvertalc \clshdrawnil \clwWidth3581\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw20\brdrcf2 \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\b\fs26\fsmilli13333 \cf2 GF 
+\b0\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 E
+\fs21\fsmilli10667 XT 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 Obj 
+\fs24 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 C
+\fs21\fsmilli10667 OMP 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clmgf \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx1728
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx3456
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5184
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6912
+\clmrg \clvertalc \clshdrawnil \clwWidth15220\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrs\brdrw60\brdrcf2 \clbrdrb\brdrnil \clbrdrr\brdrs\brdrw60\brdrcf2 \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 These correspond fairly directly to the Layer and Label tables in the database (A and B respectively in Fig.2). Each layer has a type with a name (here FE, PT, and GF) contained in the LayerType table, and each layer contains zero or more labels. Most labels are contiguous, and their extent is indicated simply by the startChar and endChar fields, but others may be discontiguous, in which case, the additional spans will be indicated by entries in the LabelPos table. Each label also has a type in the LabelType table (C in Fig. 2), which contains the fields DBTableName and DBTableID which together form a pointer to the actual content of the label. For FEs, the DBTableName is \'91FrameElement\'92 and the ID points to the appropriate FE in the FrameElement table. For all other types of label, the DB table name is \'91MiscLabel\'92; this table contains the names of the PTs, GFs, etc. 
+\fs24 \
+
+\fs29\fsmilli14667 Some FEs are considered to be conceptually present in the context, even though not expressed in the sentence; this is referred to as 
+\i null instantiation
+\i0 . Information about null instantiated FEs is stored in the InstantiationType table.
+\fs16 \up8 10 
+\fs24 \up0 \
+
+\fs29\fsmilli14667 In addition to the FE, GF, and PT layers, annotators also add labels on other layers, all of which are represented similarly. Certain syntactic information is represented by adding labels on the part-of-speech-specific layer. The most 
+\fs24 \cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell 
+\pard\intbl\itap1\cell \lastrow\row
+\pard\pardeftab720\sl180\sa240\partightenfactor0
+
+\f2\fs16 \cf2 Downloaded from https://academic.oup.com/ijl/article-abstract/16/3/281/936947/The-Structure-of-the-Framenet-Database by guest\uc0\u8232 on 16 October 2017 
+\f0\fs24 \
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw20\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\sa240\partightenfactor0
+
+\fs26\fsmilli13333 \cf2 290 Collin F. Baker, Charles J. Fillmore, Beau Cronin 
+\fs24 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw20\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrs\brdrw40\brdrcf2 \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl280\partightenfactor0
+\cf2 \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat3 \clwWidth15340\clftsWidth3 \clbrdrt\brdrs\brdrw40\brdrcf2 \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl340\sa240\partightenfactor0
+
+\fs29\fsmilli14667 \cf2 notable among these is marking of support verbs for nouns and adjectives. For example, in 
+\i He made a comment about my work
+\i0 , with the target 
+\i comment 
+\i0 in the Statement frame, 
+\i made 
+\i0 would be labeled \'91Supp\'92 on the part-of-speech- specific layer. This layer also contains labels which can be used to indicate what word is the governor of a target noun or adjective. There is also a layer marking the part of speech label for each word, which are imported along with the text when the sentences are imported; this layer is normally not used by the annotators.
+\fs16 \up8 11 
+\fs24 \up0 \
+
+\fs29\fsmilli14667 If two FEs for the same target partially overlap, annotators can add another FE layer on which to place the label. For example, in 
+\i His arm was broken in the accident
+\i0 , with 
+\i break 
+\i0 as the target in the Experience_bodily_harm frame, 
+\i his arm 
+\i0 is marked with the FE 
+\fs21\fsmilli10667 BODY
+\fs29\fsmilli14667 _
+\fs21\fsmilli10667 PART
+\fs29\fsmilli14667 , but within that, 
+\i his 
+\i0 can be additionally labeled with the FE 
+\fs21\fsmilli10667 EXPERIENCER 
+\fs29\fsmilli14667 on a second FE layer. 
+\fs24 \
+
+\fs29\fsmilli14667 As mentioned above, sentences can be annotated with regard to more than one target, which means that they will contain more than one annotation set, and probably be associated with more than one LU; each annotation set has all of the features described above, with its own layers, labels, etc. In this way, a sentence can be annotated with respect to several frame-evoking expressions, each of which contributes to the meaning of the whole. For example, 
+\i Matilde learned that Rufus had gone to Cairo 
+\i0 might be annotated once with the target 
+\i learn
+\i0 , in the Becoming_aware frame and again with respect to the target 
+\i go 
+\i0 in the Self-motion frame. 
+\i That Rufus had gone to Cairo 
+\i0 would be labeled simply as the 
+\fs21\fsmilli10667 CONTENT 
+\fs29\fsmilli14667 FE in Becoming_aware
+\i , 
+\i0 but more detailed characterization of the content would come from the Self-motion frame. The FrameNet project does not undertake to develop a theory as to how the semantic structure of the lower clause is to be integrated with the semantic structure of the matrix clause, but merely to describe the two pieces separately. 
+\fs24 \cell \lastrow\row
+}
