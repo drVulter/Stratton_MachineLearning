@@ -1,4 +1,6 @@
 # Machine Learning Project Two
 #### Quinn Stratton
 
-This project reads in two documents that are labeled as pertaining to computing or diabetes. The top 5 most frequent words and their synonyms from each of these labeled documents is then 
+This project reads in two documents that are labeled as pertaining to computing or diabetes. The top 5 most frequent words and their synonyms from each of these labeled documents are then determined, and used for classifying each unlabeled document. To classify, this project calculates the frequency of words in each of the sets of most frequent words from the labeled documents in the unlabeled documents. If the frequency from a set that was from a document labeled "Computing" was greatest, the new document would be labeled "computer". If, however, the frequency of words pertaining to either class was lower than 0.1%, the document was considered to have no class.
+
+In order to read in the files, I converted the .rtf files to .txt files, eliminating the image data that was in some of the .rtf files. These .txt files are in the labeled-docs, and unlabeled-docs directories. This project did pretty well in determining the correct class for each document, although I would like to experiment with limiting the most frequently used words further. My fear is that this would add an element of subjectivity, so perhaps it would be better to simply add more labeled documents.
