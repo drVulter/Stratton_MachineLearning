@@ -1,0 +1,135 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amsmath, mathtools, amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+% Code
+\usepackage{listings} 
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% Margins
+\usepackage{geometry}
+%\usepackage{enumitem} % for nice enumerating
+\geometry{margin=1in}
+
+% Graphics
+\usepackage{tikz}
+\usetikzlibrary{matrix} % matrices
+\usepackage{tikz-qtree} % Simple trees
+\usepackage{verbatim} % what is this for again???
+
+\setcounter{section}{-1}
+
+\newtheorem{pic}{Figure}
+\numberwithin{pic}{section}
+\newtheorem{lem}{Lemma}
+\numberwithin{lem}{section}
+\newtheorem{thm}{Theorem}
+\numberwithin{thm}{section}
+\newtheorem{cor}{Corollary}
+\numberwithin{cor}{section}
+
+\theoremstyle{definition}
+\newtheorem{ex}{Example}
+\numberwithin{ex}{section}
+\newtheorem{defn}{Definition}
+\numberwithin{defn}{section}
+\theoremstyle{definition}
+\newtheorem{prob}{Problem}
+
+\theoremstyle{remark}
+\newtheorem*{con}{Conjecture}
+\newtheorem{rem}{Remark}
+\newtheorem*{cex}{Counterexample}
+\newtheorem*{ts}{T.S.}
+
+%%% COMMANDS %%%
+% Sets
+\newcommand{\set}[1]{\ensuremath{\left\{ #1\right\}}} % write sets
+\newcommand{\e}{\ensuremath{\epsilon}} % Epsilon
+\newcommand{\R}{\ensuremath{\mathbb{R}}} % Real Numbers
+\newcommand{\N}{\ensuremath{\mathbb{N}}} % Natural numbers
+\newcommand{\Q}{\ensuremath{\mathbb{Q}}} % Rationals
+\newcommand{\I}{\ensuremath{\mathbb{I}}} % Irrational Numbers
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}} % Integers
+% Easier Delimiters?
+\newcommand{\lr}[2]{\ensuremath{\left#1 #2 \right #1}}
+% Absolute Value
+\newcommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+% Landau Notation
+\newcommand{\Oh}{\ensuremath{\mathcal{O}}} %%% IN MATH MODE
+\newcommand{\oh}{\ensuremath{\mathcal{o}}} %%% IN MATH MODE
+% Display style fractions
+\newcommand{\Frac}[2]{\displaystyle \frac{#1}{#2}}
+% Display style limits
+\newcommand{\Lim}[2]{\displaystyle \lim_{#1}{#2}}
+
+% Enumerate
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\renewcommand{\labelenumii}{\roman{enumii}}
+
+% change proof environment
+\renewcommand*{\proofname}{Pf}
+
+% Indentation
+\newlength\tindent
+\setlength{\tindent}{\parindent}
+\setlength{\parindent}{0pt}
+\renewcommand{\indent}{\hspace*{\tindent}}
+
+% Set title
+\title{Formulas}
+
+\begin{document}
+
+
+\fancyhead[l]{Quinn Stratton}
+\fancyhead[c]{ML Formulas}
+\fancyhead[r]{\today}
+\pagestyle{fancy}
+\section{Formulas}
+\begin{align}
+  Precision &= \frac{TP}{TP + FP}\\
+  Recall &= \frac{TP}{TP + FN}\\
+  F_{score} &= \frac{2TP}{2TP + FN + FP}\\
+  F_{score (weighted)} &= \frac{(1+\beta)TP}{(1+\beta)TP + \beta + FN + FP}
+\end{align}
+If $\beta = 0$, $F_{score (weighted)} = \Frac{TP}{TP + FP}$
+so \textit{Precision} is emphasized.\\
+For $n$ subgroups, the \textbf{Macro Average} is the average of the subgroups.
+\begin{align}
+  \text{Macro Average} &= \frac{\sum_{i=1}^n \text{Evaluation}_i}{n}
+\end{align}
+%If $\beta = 1$, $F_{score (weighted)} = \Frac{TP}{TP + FP}$
+%so \textit{Precision} is emphasized.
+\section{Terms}
+\begin{defn}
+  \textbf{False Positive}: Looks like a winner, but is not.
+\end{defn}
+
+\begin{defn}
+  \textbf{False Negative}: Result is true, but predicted to be false.
+\end{defn}
+
+\begin{defn}
+  \textbf{Precision}: Emphasizes \textit{correct} results. Consider a Google Search.
+\end{defn}
+
+\begin{defn}
+  \textbf{Recall}: ``Better safe than sorry''. Emphasizes more positives, even if incorrect since they can be checked later. Consider a cancer screening.
+\end{defn}
+
+\begin{defn}
+  \textbf{Overfitting}: Model fits training data, but does not show overall trend, i.e. does not accurately predict labels for test data.
+\end{defn}
+
+\begin{defn}
+  \textbf{Underfitting}: Model does not fit training data, and is too general for an accurate prediction.
+\end{defn}
+
+
+
+\end{document}
